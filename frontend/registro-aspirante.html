@@ -4,153 +4,173 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Aspirante - Sistema de Citas de Matrícula</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --primary-light: #e0e7ff;
+            --success: #059669;
+            --error: #dc2626;
+            --text: #1e1b4b;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --bg: #f5f3ff;
+            --white: #ffffff;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
             min-height: 100vh;
             padding: 40px 20px;
+            background-image: radial-gradient(circle at 20% 20%, #c7d2fe 0%, transparent 50%),
+                              radial-gradient(circle at 80% 80%, #ddd6fe 0%, transparent 50%);
         }
 
         .container {
-            max-width: 600px;
+            max-width: 560px;
             margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(79, 70, 229, 0.12);
             overflow: hidden;
-            animation: fadeIn 0.5s ease;
+            animation: slideUp 0.4s ease;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
-            padding: 30px;
+            padding: 36px 40px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 160px; height: 160px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
         }
 
-        .form-container {
-            padding: 40px;
-        }
+        .header h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; }
+        .header p  { font-size: 14px; opacity: 0.85; }
+
+        .form-container { padding: 36px 40px; }
 
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
+            gap: 16px;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .form-group { margin-bottom: 18px; }
 
         label {
             display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-            font-size: 14px;
+            margin-bottom: 6px;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.02em;
         }
+
+        label span { color: var(--error); margin-left: 2px; }
 
         input, select {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
             border-radius: 10px;
             font-size: 14px;
-            transition: all 0.3s ease;
+            font-family: inherit;
+            color: var(--text);
+            background: var(--white);
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         input:focus, select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        select { cursor: pointer; }
+
+        .select-loading {
+            color: var(--text-muted);
+            font-style: italic;
+            font-size: 13px;
+            margin-top: 4px;
+            display: none;
         }
 
         .btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 13px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
             border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
             cursor: pointer;
-            transition: transform 0.2s ease;
-            margin-top: 10px;
+            transition: transform 0.15s, box-shadow 0.15s;
+            margin-top: 8px;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-        }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(79,70,229,0.3); }
+        .btn:active { transform: translateY(0); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
         .login-link {
             text-align: center;
             margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
+            border-top: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--text-muted);
         }
 
-        .login-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            color: #666;
-            font-size: 12px;
-        }
+        .login-link a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .login-link a:hover { text-decoration: underline; }
 
         .alert {
-            padding: 12px;
+            padding: 12px 16px;
             border-radius: 10px;
             margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
             display: none;
         }
 
-        .alert.error {
-            background: #fee;
-            color: #c33;
-            border: 1px solid #fcc;
-            display: block;
+        .alert.error   { background: #fef2f2; color: var(--error);   border: 1px solid #fecaca; display: flex; align-items: center; gap: 8px; }
+        .alert.success { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; display: flex; align-items: center; gap: 8px; }
+
+        .footer {
+            text-align: center;
+            padding: 16px;
+            background: #fafafa;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid var(--border);
         }
 
-        .alert.success {
-            background: #efe;
-            color: #3c3;
-            border: 1px solid #cfc;
-            display: block;
+        .password-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 4px;
         }
     </style>
 </head>
@@ -167,50 +187,45 @@
             <form id="registroForm">
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Nombre *</label>
+                        <label>Nombre <span>*</span></label>
                         <input type="text" id="nombre" placeholder="Juan Carlos" required>
                     </div>
                     <div class="form-group">
-                        <label>Apellidos *</label>
+                        <label>Apellidos <span>*</span></label>
                         <input type="text" id="apellidos" placeholder="Pérez Gómez" required>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Correo Electrónico *</label>
+                    <label>Correo Electrónico <span>*</span></label>
                     <input type="email" id="email" placeholder="juan.perez@universidad.edu" required>
                 </div>
 
                 <div class="form-group">
                     <label>Teléfono</label>
-                    <input type="tel" id="telefono" placeholder="+503 7000 0000">
+                    <input type="tel" id="telefono" placeholder="+503 7000-0000">
                 </div>
 
                 <div class="form-group">
-                    <label>Carrera de Interés *</label>
+                    <label>Carrera de Interés <span>*</span></label>
                     <select id="carrera" required>
-                        <option value="">Seleccione una carrera</option>
-                        <option value="1">Ingeniería en Sistemas</option>
-                        <option value="2">Ingeniería Civil</option>
-                        <option value="3">Administración de Empresas</option>
-                        <option value="4">Derecho</option>
-                        <option value="5">Medicina</option>
-                        <option value="6">Arquitectura</option>
+                        <option value="">Cargando carreras...</option>
                     </select>
+                    <p class="select-loading" id="loadingCarreras">⏳ Cargando desde base de datos...</p>
                 </div>
 
                 <div class="form-group">
-                    <label>Contraseña *</label>
+                    <label>Contraseña <span>*</span></label>
                     <input type="password" id="password" placeholder="••••••••" required>
-                    <small style="color: #666; font-size: 12px;">Mínimo 6 caracteres</small>
+                    <p class="password-hint">Mínimo 6 caracteres</p>
                 </div>
 
                 <div class="form-group">
-                    <label>Confirmar Contraseña *</label>
+                    <label>Confirmar Contraseña <span>*</span></label>
                     <input type="password" id="confirmPassword" placeholder="••••••••" required>
                 </div>
 
-                <button type="submit" class="btn">Registrarse</button>
+                <button type="submit" class="btn" id="btnRegistrar">Crear Cuenta</button>
 
                 <div class="login-link">
                     ¿Ya tienes cuenta? <a href="login-aspirante.html">Iniciar Sesión</a>
@@ -218,102 +233,100 @@
             </form>
         </div>
 
-        <div class="footer">
-            © 2024 Universidad. Todos los derechos reservados.
-        </div>
+        <div class="footer">© 2026 Universidad. Todos los derechos reservados.</div>
     </div>
 
     <script>
-        // URL de la API - Cambia el puerto si es necesario
         const API_URL = 'http://localhost:3000/api';
 
+        // ── Cargar carreras desde la BD ──────────────────────────────
+        async function cargarCarreras() {
+            const select = document.getElementById('carrera');
+            try {
+                const res = await fetch(`${API_URL}/carreras`);
+                if (!res.ok) throw new Error('Error al obtener carreras');
+                const carreras = await res.json();
+
+                select.innerHTML = '<option value="">Seleccione una carrera</option>';
+                carreras.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.id_carrera;
+                    opt.textContent = c.nombre_carrera;
+                    select.appendChild(opt);
+                });
+            } catch (e) {
+                console.error('No se pudieron cargar las carreras:', e);
+                select.innerHTML = '<option value="">Error al cargar carreras</option>';
+            }
+        }
+
+        // ── Registro ─────────────────────────────────────────────────
         document.getElementById('registroForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const nombre = document.getElementById('nombre').value;
-            const apellidos = document.getElementById('apellidos').value;
-            const email = document.getElementById('email').value;
-            const telefono = document.getElementById('telefono').value;
+            const alertDiv   = document.getElementById('alert');
+            const btn        = document.getElementById('btnRegistrar');
+            const nombre     = document.getElementById('nombre').value.trim();
+            const apellidos  = document.getElementById('apellidos').value.trim();
+            const email      = document.getElementById('email').value.trim();
+            const telefono   = document.getElementById('telefono').value.trim();
             const id_carrera_elegida = document.getElementById('carrera').value;
-            const password = document.getElementById('password').value;
+            const password   = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            const alertDiv = document.getElementById('alert');
-            
+
             // Validaciones
             if (!nombre || !apellidos || !email || !password) {
                 alertDiv.className = 'alert error';
-                alertDiv.textContent = 'Por favor complete todos los campos obligatorios';
+                alertDiv.innerHTML = '⚠️ Complete todos los campos obligatorios';
                 return;
             }
-            
             if (password !== confirmPassword) {
                 alertDiv.className = 'alert error';
-                alertDiv.textContent = 'Las contraseñas no coinciden';
+                alertDiv.innerHTML = '⚠️ Las contraseñas no coinciden';
                 return;
             }
-            
             if (password.length < 6) {
                 alertDiv.className = 'alert error';
-                alertDiv.textContent = 'La contraseña debe tener al menos 6 caracteres';
+                alertDiv.innerHTML = '⚠️ La contraseña debe tener al menos 6 caracteres';
                 return;
             }
-            
             if (!id_carrera_elegida) {
                 alertDiv.className = 'alert error';
-                alertDiv.textContent = 'Por favor seleccione una carrera de interés';
+                alertDiv.innerHTML = '⚠️ Seleccione una carrera de interés';
                 return;
             }
-            
+
+            btn.disabled = true;
+            btn.textContent = 'Registrando...';
+
             try {
                 const response = await fetch(`${API_URL}/aspirantes/registro`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        nombre,        // ✅ Corregido: antes era "nombres"
-                        apellidos,
-                        email,
-                        telefono,
-                        id_carrera_elegida,
-                        password
-                    })
+                    body: JSON.stringify({ nombre, apellidos, email, telefono, id_carrera_elegida, password })
                 });
-                
+
+                const data = await response.json();
+
                 if (response.ok) {
-                    const data = await response.json();
                     alertDiv.className = 'alert success';
-                    alertDiv.textContent = 'Registro exitoso. Redirigiendo al login...';
-                    
-                    setTimeout(() => {
-                        window.location.href = 'login-aspirante.html';
-                    }, 2000);
+                    alertDiv.innerHTML = '✅ Registro exitoso. Redirigiendo al login...';
+                    setTimeout(() => window.location.href = 'login-aspirante.html', 2000);
                 } else {
-                    const error = await response.json();
                     alertDiv.className = 'alert error';
-                    alertDiv.textContent = error.message || 'Error en el registro. El email podría estar duplicado.';
+                    alertDiv.innerHTML = `⚠️ ${data.message || 'Error en el registro'}`;
+                    btn.disabled = false;
+                    btn.textContent = 'Crear Cuenta';
                 }
             } catch (error) {
-                // Demo: Simular registro exitoso (para pruebas sin backend)
-                console.log('Error de conexión, usando modo demo:', error);
-                alertDiv.className = 'alert success';
-                alertDiv.textContent = 'Registro exitoso (Demo). Redirigiendo al login...';
-                
-                // Guardar en localStorage para demo
-                const nuevoAspirante = {
-                    id_aspirante: Date.now(),
-                    nombre: nombre,
-                    apellidos: apellidos,
-                    email: email,
-                    telefono: telefono,
-                    id_carrera_elegida: id_carrera_elegida
-                };
-                localStorage.setItem('demoAspirante', JSON.stringify(nuevoAspirante));
-                
-                setTimeout(() => {
-                    window.location.href = 'login-aspirante.html';
-                }, 2000);
+                alertDiv.className = 'alert error';
+                alertDiv.innerHTML = '⚠️ No se pudo conectar con el servidor';
+                btn.disabled = false;
+                btn.textContent = 'Crear Cuenta';
             }
         });
+
+        // Inicializar
+        cargarCarreras();
     </script>
 </body>
 </html>

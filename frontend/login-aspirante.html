@@ -4,211 +4,185 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión - Sistema de Citas de Matrícula</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --success: #059669;
+            --error: #dc2626;
+            --text: #1e1b4b;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --bg: #f5f3ff;
+            --white: #ffffff;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
+            background-image: radial-gradient(circle at 20% 20%, #c7d2fe 0%, transparent 50%),
+                              radial-gradient(circle at 80% 80%, #ddd6fe 0%, transparent 50%);
         }
 
         .container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            background: var(--white);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px rgba(79, 70, 229, 0.12);
             overflow: hidden;
             width: 100%;
-            max-width: 450px;
-            animation: fadeIn 0.5s ease;
+            max-width: 440px;
+            animation: slideUp 0.4s ease;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             padding: 40px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
         }
 
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 10px;
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -40px; right: -40px;
+            width: 160px; height: 160px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
         }
 
-        .header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
+        .header .icon { font-size: 40px; margin-bottom: 12px; }
+        .header h1   { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+        .header p    { font-size: 13px; opacity: 0.85; }
 
-        .form-container {
-            padding: 40px;
-        }
+        .form-container { padding: 36px 40px; }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+        .form-group { margin-bottom: 18px; }
 
         label {
             display: block;
-            margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-            font-size: 14px;
+            margin-bottom: 6px;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 13px;
         }
 
-        input, select {
+        input {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e0e0e0;
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
             border-radius: 10px;
             font-size: 14px;
-            transition: all 0.3s ease;
             font-family: inherit;
+            color: var(--text);
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        input:focus, select:focus {
+        input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
-        .checkbox-group {
+        .checkbox-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
             margin-bottom: 20px;
         }
 
-        .checkbox-group label {
-            margin-bottom: 0;
+        .checkbox-label {
             display: flex;
             align-items: center;
             gap: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
             cursor: pointer;
         }
 
-        .checkbox-group input {
-            width: auto;
-            margin: 0;
-        }
+        .checkbox-label input { width: auto; }
 
-        .forgot-password {
-            color: #667eea;
-            text-decoration: none;
-            font-size: 14px;
-        }
-
-        .forgot-password:hover {
-            text-decoration: underline;
-        }
+        .forgot { color: var(--primary); text-decoration: none; font-size: 13px; font-weight: 600; }
+        .forgot:hover { text-decoration: underline; }
 
         .btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 13px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             border: none;
             border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: inherit;
             cursor: pointer;
-            transition: transform 0.2s ease;
+            transition: transform 0.15s, box-shadow 0.15s;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn:active {
-            transform: translateY(0);
-        }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(79,70,229,0.3); }
+        .btn:active { transform: translateY(0); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
         .register-link {
             text-align: center;
             margin-top: 20px;
             padding-top: 20px;
-            border-top: 1px solid #e0e0e0;
+            border-top: 1px solid var(--border);
+            font-size: 14px;
+            color: var(--text-muted);
         }
 
-        .register-link a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .register-link a:hover {
-            text-decoration: underline;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            color: #666;
-            font-size: 12px;
-        }
+        .register-link a { color: var(--primary); text-decoration: none; font-weight: 600; }
+        .register-link a:hover { text-decoration: underline; }
 
         .alert {
-            padding: 12px;
+            padding: 12px 16px;
             border-radius: 10px;
             margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
             display: none;
         }
 
-        .alert.error {
-            background: #fee;
-            color: #c33;
-            border: 1px solid #fcc;
-            display: block;
-        }
+        .alert.error   { background: #fef2f2; color: var(--error);   border: 1px solid #fecaca; display: flex; align-items: center; gap: 8px; }
+        .alert.success { background: #ecfdf5; color: var(--success); border: 1px solid #a7f3d0; display: flex; align-items: center; gap: 8px; }
 
-        .alert.success {
-            background: #efe;
-            color: #3c3;
-            border: 1px solid #cfc;
-            display: block;
+        .footer {
+            text-align: center;
+            padding: 16px;
+            background: #fafafa;
+            color: var(--text-muted);
+            font-size: 12px;
+            border-top: 1px solid var(--border);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
+            <div class="icon">🎓</div>
             <h1>Sistema de Citas de Matrícula</h1>
-            <p>Iniciar Sesión - Aspirantes</p>
+            <p>Ingresa con tu cuenta de aspirante</p>
         </div>
 
         <div class="form-container">
             <div id="alert" class="alert"></div>
 
             <form id="loginForm">
-                <div class="form-group">
-                    <label>Tipo de Usuario</label>
-                    <select id="tipoUsuario" required>
-                        <option value="aspirante">Aspirante</option>
-                        <option value="estudiante">Estudiante</option>
-                        <option value="admin">Administrador</option>
-                    </select>
-                </div>
-
                 <div class="form-group">
                     <label>Correo Electrónico</label>
                     <input type="email" id="email" placeholder="ejemplo@universidad.edu" required>
@@ -219,14 +193,14 @@
                     <input type="password" id="password" placeholder="••••••••" required>
                 </div>
 
-                <div class="checkbox-group">
-                    <label>
-                        <input type="checkbox" id="remember"> Recordar Sesión
+                <div class="checkbox-row">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="remember"> Recordar sesión
                     </label>
-                    <a href="#" class="forgot-password" id="forgotPassword">¿Olvidó su contraseña?</a>
+                    <a href="#" class="forgot" id="forgotPassword">¿Olvidó su contraseña?</a>
                 </div>
 
-                <button type="submit" class="btn">Ingresar</button>
+                <button type="submit" class="btn" id="btnLogin">Ingresar</button>
 
                 <div class="register-link">
                     ¿Eres nuevo aspirante? <a href="registro-aspirante.html">Registrarse aquí</a>
@@ -234,91 +208,68 @@
             </form>
         </div>
 
-        <div class="footer">
-            © 2024 Universidad. Todos los derechos reservados.
-        </div>
+        <div class="footer">© 2026 Universidad. Todos los derechos reservados.</div>
     </div>
 
     <script>
-        // URL de la API - Cambia el puerto si es necesario
         const API_URL = 'http://localhost:3000/api';
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const tipoUsuario = document.getElementById('tipoUsuario').value;
-            const remember = document.getElementById('remember').checked;
-            
             const alertDiv = document.getElementById('alert');
-            
-            // Validar campos
+            const btn      = document.getElementById('btnLogin');
+            const email    = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+
             if (!email || !password) {
                 alertDiv.className = 'alert error';
-                alertDiv.textContent = 'Por favor complete todos los campos';
+                alertDiv.innerHTML = '⚠️ Por favor complete todos los campos';
                 return;
             }
-            
+
+            btn.disabled = true;
+            btn.textContent = 'Ingresando...';
+
             try {
                 const response = await fetch(`${API_URL}/aspirantes/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password, tipoUsuario, remember })
+                    body: JSON.stringify({ email, password })
                 });
-                
+
+                const data = await response.json();
+
                 if (response.ok) {
-                    const data = await response.json();
                     alertDiv.className = 'alert success';
-                    alertDiv.textContent = 'Inicio de sesión exitoso. Redirigiendo...';
-                    
-                    if (remember) {
-                        localStorage.setItem('userEmail', email);
-                        localStorage.setItem('userToken', data.token);
-                    }
-                    
+                    alertDiv.innerHTML = '✅ Inicio de sesión exitoso. Redirigiendo...';
+
                     // Guardar datos del aspirante
-                    localStorage.setItem('aspiranteActual', JSON.stringify(data.aspirante || data));
-                    
-                    setTimeout(() => {
-                        window.location.href = 'dashboard-aspirante.html';
-                    }, 1500);
+                    localStorage.setItem('aspiranteActual', JSON.stringify(data.aspirante));
+                    if (remember) localStorage.setItem('userEmail', email);
+
+                    setTimeout(() => window.location.href = 'dashboard-aspirante.html', 1500);
                 } else {
-                    const error = await response.json();
                     alertDiv.className = 'alert error';
-                    alertDiv.textContent = error.message || 'Credenciales incorrectas';
+                    alertDiv.innerHTML = `⚠️ ${data.message || 'Credenciales incorrectas'}`;
+                    btn.disabled = false;
+                    btn.textContent = 'Ingresar';
                 }
             } catch (error) {
-                // Demo: Simular login exitoso (para pruebas sin backend)
-                console.log('Error de conexión, usando modo demo:', error);
-                alertDiv.className = 'alert success';
-                alertDiv.textContent = 'Inicio de sesión exitoso (Demo). Redirigiendo...';
-                
-                // Guardar datos demo
-                const demoUser = {
-                    id_aspirante: 1,
-                    nombre: 'Juan',
-                    apellidos: 'Pérez',
-                    email: email,
-                    telefono: '7000-0000',
-                    id_carrera_elegida: 1
-                };
-                localStorage.setItem('aspiranteActual', JSON.stringify(demoUser));
-                localStorage.setItem('userEmail', email);
-                
-                setTimeout(() => {
-                    window.location.href = 'dashboard-aspirante.html';
-                }, 1500);
+                alertDiv.className = 'alert error';
+                alertDiv.innerHTML = '⚠️ No se pudo conectar con el servidor';
+                btn.disabled = false;
+                btn.textContent = 'Ingresar';
             }
         });
-        
+
         // Cargar email guardado
         const savedEmail = localStorage.getItem('userEmail');
         if (savedEmail) {
             document.getElementById('email').value = savedEmail;
             document.getElementById('remember').checked = true;
         }
-        
+
         document.getElementById('forgotPassword').addEventListener('click', (e) => {
             e.preventDefault();
             alert('Por favor contacte al administrador para restablecer su contraseña.');
