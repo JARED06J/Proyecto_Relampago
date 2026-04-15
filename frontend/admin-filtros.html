@@ -1,0 +1,150 @@
+]<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Filtros de Estudiantes</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+}
+
+.navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo h2 {
+    font-size: 20px;
+}
+
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    margin-left: 25px;
+    padding: 8px 15px;
+    border-radius: 8px;
+    transition: background 0.3s;
+    cursor: pointer;
+}
+
+.nav-links a:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.card h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+select, input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: transform 0.2s;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.cita-card {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 10px;
+    border-left: 4px solid #667eea;
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="logo">
+        <h2>Sistema de Citas de Matrícula</h2>
+    </div>
+    <div class="nav-links">
+        <a href="admin-filtros.html">Filtros</a>
+        <a href="consulta-masiva.html">Consulta</a>
+        <a href="correos.html">Correos</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="card">
+        <h3>🎯 Filtrar Estudiantes</h3>
+
+        <select id="filtroEstado">
+            <option value="">Todos</option>
+            <option value="1">Matriculados</option>
+            <option value="0">No matriculados</option>
+        </select>
+
+        <button class="btn" onclick="filtrar()">Filtrar</button>
+
+        <div id="resultado"></div>
+    </div>
+
+</div>
+
+<script>
+async function filtrar() {
+    const val = document.getElementById("filtroEstado").value;
+
+    const url = val 
+        ? `http://localhost:3000/api/matricula?matriculo=${val}`
+        : `http://localhost:3000/api/matricula`;
+
+    const res = await fetch(url);
+    const data = await res.json();
+
+    document.getElementById("resultado").innerHTML =
+        data.data.map(x => `
+            <div class="cita-card">
+                ${x.nombre} - ${x.estado}
+            </div>
+        `).join("");
+}
+</script>
+
+</body>
+</html>

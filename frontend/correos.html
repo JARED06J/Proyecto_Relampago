@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Envío de Correos</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+}
+
+.navbar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-links a {
+    color: white;
+    margin-left: 20px;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+}
+
+.nav-links a:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+.card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.card h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+input, select, textarea {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.resultado {
+    margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="logo">
+        <h2>Sistema de Matrícula</h2>
+    </div>
+    <div class="nav-links">
+        <a href="admin-filtros.html">Filtros</a>
+        <a href="consulta-masiva.html">Consulta</a>
+        <a href="correos.html">Correos</a>
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="card">
+        <h3>📧 Envío Masivo de Correos</h3>
+
+        <select id="tipo">
+            <option value="carrera">Por carrera</option>
+            <option value="estado">Por estado</option>
+            <option value="emails">Lista de emails</option>
+        </select>
+
+        <input type="text" id="valor" placeholder="Ej: 1 o correo1,correo2">
+
+        <input type="text" id="asunto" placeholder="Asunto">
+
+        <textarea id="mensaje" rows="4" placeholder="Mensaje"></textarea>
+
+        <button class="btn" onclick="enviar()">Enviar Correos</button>
+
+        <div id="resultado" class="resultado"></div>
+    </div>
+
+</div>
+
+<script>
+async function enviar() {
+    let tipo = document.getElementById("tipo").value;
+    let valor = document.getElementById("valor").value;
+
+    if (tipo === "emails") {
+        valor = valor.split(",");
+    }
+
+    const res = await fetch("http://localhost:3000/api/matricula/enviar-correos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            tipo,
+            valor,
+            asunto: document.getElementById("asunto").value,
+            mensaje: document.getElementById("mensaje").value
+        })
+    });
+
+    const data = await res.json();
+
+    document.getElementById("resultado").innerHTML = `
+        <div class="cita-card">
+            ✔ Correos enviados: ${data.data.total}
+        </div>
+    `;
+}
+</script>
+
+</body>
+</html>
