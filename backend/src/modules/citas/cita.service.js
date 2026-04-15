@@ -9,7 +9,6 @@ async function obtenerCita(id) {
   return c;
 }
 
-// PUNTO 3: Listado de citas asignadas por carrera
 async function listarCitasPorCarrera(id_carrera) {
   if (!id_carrera) { const err = new Error('Se requiere id_carrera'); err.status = 400; throw err; }
   return repo.findByCarrera(id_carrera);
@@ -49,7 +48,13 @@ async function listarHorariosDisponiblesPorCarrera(id_carrera) {
   return repo.findHorariosDisponiblesByCarrera(id_carrera);
 }
 
-
-
-
-module.exports = { listarCitas, obtenerCita, listarCitasPorCarrera, crearAsignacion, actualizarMatriculo, eliminarAsignacion };
+module.exports = { 
+    listarCitas, 
+    obtenerCita, 
+    listarCitasPorCarrera, 
+    crearAsignacion, 
+    actualizarMatriculo, 
+    eliminarAsignacion,
+    listarHorariosDisponibles,
+    listarHorariosDisponiblesPorCarrera
+};
