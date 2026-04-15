@@ -2,8 +2,8 @@ const aspiranteRepo = require('./aspirante.repository');
 
 async function registrarAspirante(datos) {
   // Validar campos requeridos
-  if (!datos.nombres || !datos.apellidos || !datos.email) {
-    throw { status: 400, message: 'Nombres, apellidos y email son obligatorios' };
+  if (!datos.nombre || !datos.apellidos || !datos.email) {  // Cambiado de "nombres" a "nombre"
+    throw { status: 400, message: 'Nombre, apellidos y email son obligatorios' };
   }
 
   // Verificar que no exista ya ese email
