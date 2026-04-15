@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 // src/modules/matricula/matricula.controller.js
 const service = require('./matricula.service');
 
@@ -38,12 +37,6 @@ const filtrar = async (req, res) => {
         });
     }
 };
-module.exports = {
-    consultarMasivo,
-    filtrar
-};
-=======
-const service = require('./matricula.service');
 
 async function getAll(req, res, next) {
   try { res.json(await service.listarCitasMatricula()); } catch (err) { next(err); }
@@ -64,5 +57,49 @@ async function remove(req, res, next) {
   try { await service.eliminarCitaMatricula(req.params.id); res.json({ mensaje: 'Eliminado' }); } catch (err) { next(err); }
 }
 
-module.exports = { getAll, getOne, getByCarrera, create, update, remove };
->>>>>>> 952b4713e1c78fd3342135b0b25530836de5589e
+// matricula.controller.js
+
+const obtenerPorCarrera = async (req, res) => {
+    try {
+        const { idCarrera } = req.params;
+
+        const data = await service.obtenerPorCarrera(idCarrera);
+
+        res.json({
+            ok: true,
+            data
+        });
+
+    } catch (error) {
+        res.status(400).json({
+            ok: false,
+            message: error.message
+        });
+    }
+};
+
+const enviarCorreos = async (req, res) => {
+    try {
+        const { tipo, valor, asunto, mensaje } = req.body;
+
+        const data = await service.enviarCorreos({
+            tipo,
+            valor,
+            asunto,
+            mensaje
+        });
+
+        res.json({
+            ok: true,
+            data
+        });
+
+    } catch (error) {
+        res.status(400).json({
+            ok: false,
+            message: error.message
+        });
+    }
+};
+module.exports = { getAll, getOne, getByCarrera, create, update, remove,    consultarMasivo,
+    filtrar, obtenerPorCarrera, enviarCorreos };

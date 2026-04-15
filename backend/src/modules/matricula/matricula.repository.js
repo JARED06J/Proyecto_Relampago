@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 // src/modules/matricula/matricula.repository.js
-const { pool, poolConnect, sql } = require('../../config/db');
-=======
-const { getPool } = require('../../config/db');
+const {getPool, sql } = require('../../config/db');
 
 // PUNTO 2: tabla citas_matricula — fecha, hora_inicio, hora_fin
 
@@ -90,10 +87,9 @@ async function remove(id) {
     .query('DELETE FROM citas_matricula WHERE id_cita = @id');
   return result.rowsAffected[0] > 0;
 }
->>>>>>> 952b4713e1c78fd3342135b0b25530836de5589e
 
 const consultarPorEmails = async (emails) => {
-    await poolConnect;
+    const pool = await getPool();
 
     if (!emails || emails.length === 0) {
         throw new Error("Debe enviar al menos un email");
@@ -124,15 +120,13 @@ const consultarPorEmails = async (emails) => {
         WHERE ${condiciones}
     `;
 
-<<<<<<< HEAD
     const result = await request.query(query);
 
     return result.recordset;
 };
 
 const filtrarPorEstado = async (matriculo) => {
-    await poolConnect;
-
+    const pool = await getPool();
     const request = pool.request();
 
     let query = `
@@ -158,13 +152,32 @@ const filtrarPorEstado = async (matriculo) => {
 
     return result.recordset;
 };
+// matricula.repository.js
 
-module.exports = {
-    consultarPorEmails,
-    filtrarPorEstado
+const obtenerMatriculadosPorCarrera = async (idCarrera) => {
+    const pool = await getPool();
+    const request = pool.request();
+
+    request.input('id_carrera', sql.Int, idCarrera);
+
+    const query = `
+        SELECT 
+            a.id_aspirante,
+            a.nombre,
+            a.apellidos,
+            a.email,
+            c.nombre_carrera AS carrera
+        FROM aspirantes a
+        JOIN carreras c 
+            ON a.id_carrera_elegida = c.id_carrera
+        JOIN asignacion_citas ac 
+            ON a.id_aspirante = ac.id_aspirante
+        WHERE ac.matriculo = 1
+        AND c.id_carrera = @id_carrera
+    `;
+
+    const result = await request.query(query);
+
+    return result.recordset;
 };
-=======
-    return db
-}
-module.exports = { findAll, findById, findByCarrera, create, update, remove, consultarPorEmails };
->>>>>>> 952b4713e1c78fd3342135b0b25530836de5589e
+module.exports = { findAll, findById, findByCarrera, create, update, remove, consultarPorEmails, filtrarPorEstado,obtenerMatriculadosPorCarrera };

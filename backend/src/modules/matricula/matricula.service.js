@@ -1,6 +1,5 @@
-<<<<<<< HEAD
 // src/modules/matricula/matricula.service.js
-// matricula.service.js
+
 const repository = require('./matricula.repository');
 
 const consultarMasivo = async (emails) => {
@@ -25,61 +24,117 @@ const filtrarPorEstado = async (matriculo) => {
     return await repository.filtrarPorEstado();
 };
 
+const obtenerPorCarrera = async (idCarrera) => {
+    if (!idCarrera) {
+        throw new Error("Debe enviar el id de la carrera");
+    }
+
+    return await repository.obtenerMatriculadosPorCarrera(idCarrera);
+};
+
+const listarCitasMatricula = async () => {
+    return await repository.findAll();
+};
+
+const obtenerCitaMatricula = async (id) => {
+    const m = await repository.findById(id);
+    if (!m) {
+        const err = new Error('Cita de matrícula no encontrada');
+        err.status = 404;
+        throw err;
+    }
+    return m;
+};
+
+const listarPorCarrera = async (idCarrera) => {
+    return await repository.findByCarrera(idCarrera);
+};
+
+const crearCitaMatricula = async (datos) => {
+    const { id_carrera, fecha, hora_inicio, hora_fin } = datos;
+
+    if (!id_carrera || !fecha || !hora_inicio || !hora_fin) {
+        throw new Error('Todos los campos son requeridos');
+    }
+
+    if (hora_inicio >= hora_fin) {
+        throw new Error('hora_inicio debe ser menor que hora_fin');
+    }
+
+    return await repository.create(datos);
+};
+
+const actualizarCitaMatricula = async (id, datos) => {
+    await obtenerCitaMatricula(id);
+
+    const { id_carrera, fecha, hora_inicio, hora_fin } = datos;
+
+    if (!id_carrera || !fecha || !hora_inicio || !hora_fin) {
+        throw new Error('Todos los campos son requeridos');
+    }
+
+    if (hora_inicio >= hora_fin) {
+        throw new Error('hora_inicio debe ser menor que hora_fin');
+    }
+
+    return await repository.update(id, datos);
+};
+
+const eliminarCitaMatricula = async (id) => {
+    await obtenerCitaMatricula(id);
+    return await repository.remove(id);
+};
+
+
+const enviarCorreos = async ({ tipo, valor, asunto, mensaje }) => {
+    let destinatarios = [];
+
+    if (!asunto || !mensaje) {
+        throw new Error("Asunto y mensaje son requeridos");
+    }
+
+    switch (tipo) {
+        case 'carrera':
+            destinatarios = await repository.obtenerMatriculadosPorCarrera(valor);
+            break;
+
+        case 'estado':
+            destinatarios = await repository.filtrarPorEstado(valor);
+            break;
+
+        case 'emails':
+            destinatarios = await repository.consultarPorEmails(valor);
+            break;
+
+        default:
+            throw new Error("Tipo inválido (carrera, estado, emails)");
+    }
+
+    // 🔥 Simulación de envío
+    const enviados = destinatarios.map(d => ({
+        email: d.email,
+        estado: "ENVIADO"
+    }));
+
+    console.log("📨 Correos enviados:");
+    enviados.forEach(e => console.log(`✔ ${e.email}`));
+
+    return {
+        total: enviados.length,
+        enviados
+    };
+};
+
 module.exports = {
     consultarMasivo,
-    filtrarPorEstado 
+    filtrarPorEstado,
+    obtenerPorCarrera,
+    enviarCorreos,
+
+    listarCitasMatricula,
+    obtenerCitaMatricula,
+    listarPorCarrera,
+    crearCitaMatricula,
+    actualizarCitaMatricula,
+    eliminarCitaMatricula
 };
-=======
-const repo = require('./matricula.repository');
-
-async function listarCitasMatricula() { return repo.findAll(); }
-
-async function obtenerCitaMatricula(id) {
-  const m = await repo.findById(id);
-  if (!m) { const err = new Error('Cita de matricula no encontrada'); err.status = 404; throw err; }
-  return m;
-}
-
-async function listarPorCarrera(id_carrera) {
-  return repo.findByCarrera(id_carrera);
-}
-
-// PUNTO 2: Crear slot con fecha y horas
-async function crearCitaMatricula(datos) {
-  const { id_carrera, fecha, hora_inicio, hora_fin } = datos;
-  if (!id_carrera || !fecha || !hora_inicio || !hora_fin) {
-    const err = new Error('id_carrera, fecha, hora_inicio y hora_fin son requeridos');
-    err.status = 400; throw err;
-  }
-  if (hora_inicio >= hora_fin) {
-    const err = new Error('hora_inicio debe ser anterior a hora_fin');
-    err.status = 400; throw err;
-  }
-  return repo.create(datos);
-}
-
-// PUNTO 2: Actualizar fecha y horas de la cita
-async function actualizarCitaMatricula(id, datos) {
-  await obtenerCitaMatricula(id);
-  const { id_carrera, fecha, hora_inicio, hora_fin } = datos;
-  if (!id_carrera || !fecha || !hora_inicio || !hora_fin) {
-    const err = new Error('id_carrera, fecha, hora_inicio y hora_fin son requeridos');
-    err.status = 400; throw err;
-  }
-  if (hora_inicio >= hora_fin) {
-    const err = new Error('hora_inicio debe ser anterior a hora_fin');
-    err.status = 400; throw err;
-  }
-  return repo.update(id, datos);
-}
-
-async function eliminarCitaMatricula(id) {
-  await obtenerCitaMatricula(id);
-  return repo.remove(id);
-}
-
-module.exports = {
-  listarCitasMatricula, obtenerCitaMatricula, listarPorCarrera,
-  crearCitaMatricula, actualizarCitaMatricula, eliminarCitaMatricula
-};
->>>>>>> 952b4713e1c78fd3342135b0b25530836de5589e

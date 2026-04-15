@@ -1,26 +1,31 @@
-<<<<<<< HEAD
-// src/modules/matricula/matricula.routes.js
 const express = require('express');
 const router = express.Router();
 
-const { consultarMasivo } = require('./matricula.controller');
-const { filtrar } = require('./matricula.controller');
+const {
+    consultarMasivo,
+    filtrar,
+    obtenerPorCarrera,
+    getAll,
+    getOne,
+    getByCarrera,
+    create,
+    update,
+    remove,
+    enviarCorreos
+} = require('./matricula.controller');
+
 
 router.post('/consulta-email', consultarMasivo);
 router.get('/', filtrar);
+router.post('/enviar-correos', enviarCorreos);
+
+router.get('/matriculados/carrera/:idCarrera', obtenerPorCarrera);
+
+router.get('/citas', getAll);
+router.get('/citas/:id', getOne);
+router.get('/citas/carrera/:id_carrera', getByCarrera);
+router.post('/citas', create);
+router.put('/citas/:id', update);
+router.delete('/citas/:id', remove);
 
 module.exports = router;
-=======
-const express = require('express');
-const router = express.Router();
-const ctrl = require('./matricula.controller');
-
-router.get('/', ctrl.getAll);
-router.get('/carrera/:id_carrera', ctrl.getByCarrera);
-router.get('/:id', ctrl.getOne);
-router.post('/', ctrl.create);          // PUNTO 2: Crear con fecha, hora_inicio, hora_fin
-router.put('/:id', ctrl.update);        // PUNTO 2: Actualizar fechas/horas
-router.delete('/:id', ctrl.remove);
-
-module.exports = router;
->>>>>>> 952b4713e1c78fd3342135b0b25530836de5589e
