@@ -552,21 +552,48 @@
 
   async function solicitarCita() {
     const carrera_id = document.getElementById('asp-carrera-sel').value;
-    const fecha_hora = document.getElementById('asp-fecha-input').value;
-    const notas = document.getElementById('asp-notas').value;
     const res = document.getElementById('asp-result');
-    if (!carrera_id || !fecha_hora) { res.className='correo-result err'; res.textContent='Seleccione carrera y fecha'; return; }
+    
+    if (!carrera_id) {
+        res.className = 'correo-result err';
+        res.textContent = 'Seleccione una carrera';
+        return;
+    }
+    
     try {
-      // aspirante_id = 1 como demo (en producción vendría del login real)
-      const cita = await api('/citas', { method: 'POST', body: JSON.stringify({ aspirante_id: 1, carrera_id, fecha_hora, notas }) });
-      res.className = 'correo-result ok';
-      res.textContent = '✅ Cita solicitada correctamente. Se enviará un correo de confirmación.';
-      document.getElementById('asp-estado-txt').textContent = cita.estado;
-      document.getElementById('asp-fecha-txt').textContent = fmtFecha(cita.fecha_hora);
-      document.getElementById('asp-hora-txt').textContent = fmtHora(cita.fecha_hora);
-      mostrarDetalleCita(cita);
-    } catch (e) { res.className='correo-result err'; res.textContent='❌ ' + e.message; }
-  }
+        // 1. Obtener horarios disponibles para esa carrera
+        const horarios = await api(`/citas/disponibles/carrera/${carrera_id}`);
+        
+        if (!horarios || horarios.length === 0) {
+            throw new Error('No hay horarios disponibles para esta carrera');
+        }
+        
+        // 2. Tomar el primer horario disponible
+        const id_cita = horarios[0].id_cita;
+        
+        // 3. Obtener el id_aspirante (debes tenerlo del login)
+        // Por ahora usamos un valor de prueba, pero idealmente viene del login
+        const aspiranteGuardado = JSON.parse(localStorage.getItem('aspiranteActual') || '{}');
+        const id_aspirante = parseInt(aspiranteGuardado.id_aspirante) || 1;
+        
+        // 4. Enviar la solicitud con los datos correctos
+        await api('/citas', {
+            method: 'POST',
+            body: JSON.stringify({ id_aspirante, id_cita })
+        });
+        
+        res.className = 'correo-result ok';
+        res.textContent = '✅ ¡Cita solicitada exitosamente!';
+        toast('✅ Cita solicitada');
+        
+        // Recargar la información de la cita
+        setTimeout(() => cargarCitaAspirante(id_aspirante), 1500);
+        
+    } catch (error) {
+        res.className = 'correo-result err';
+        res.textContent = '❌ ' + error.message;
+    }
+}
 
   function mostrarDetalleCita(cita) {
     document.getElementById('asp-cita-info').innerHTML = `
@@ -586,6 +613,33 @@
         ${cita.notas ? `<div style="font-size:13px;background:#f8fafc;padding:10px;border-radius:8px"><span style="color:#64748b">Notas:</span> ${cita.notas}</div>` : ''}
       </div>`;
   }
+
+
+
+async function cargarCitaAspirante(id_aspirante) {
+    try {
+        const citas = await api('/citas');
+        const miCita = citas.find(c => c.id_aspirante === id_aspirante);
+        if (miCita) {
+            document.getElementById('asp-estado-txt').textContent = miCita.matriculo ? 'Matriculado' : 'Con Cita';
+            document.getElementById('asp-fecha-txt').textContent = fmtFecha(miCita.fecha);
+            document.getElementById('asp-hora-txt').textContent = fmtHora(miCita.hora_inicio);
+            document.getElementById('asp-cita-info').innerHTML = `
+                <div style="display:flex;flex-direction:column;gap:12px">
+                    <div><strong>Carrera:</strong> ${miCita.nombre_carrera || '—'}</div>
+                    <div><strong>Fecha:</strong> ${fmtFecha(miCita.fecha)}</div>
+                    <div><strong>Hora:</strong> ${fmtHora(miCita.hora_inicio)} - ${fmtHora(miCita.hora_fin)}</div>
+                    <div><strong>Estado:</strong> ${badgeMatriculo(miCita.matriculo)}</div>
+                </div>`;
+        }
+    } catch (e) {
+        console.error('Error cargando cita:', e);
+    }
+}
+
+
+
+
 
   // ─── ENCARGADO ────────────────────────────────────────────
   async function iniciarEncargado() {

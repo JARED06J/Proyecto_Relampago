@@ -6,7 +6,7 @@ async function findAll() {
   const pool = await getPool();
   const result = await pool.request().query(`
     SELECT ac.id_asignacion, ac.matriculo,
-           a.id_aspirante, a.nombres, a.apellidos, a.email,
+           a.id_aspirante, a.nombre, a.apellidos, a.email,
            cm.id_cita, cm.fecha, cm.hora_inicio, cm.hora_fin,
            c.id_carrera, c.nombre_carrera
     FROM asignacion_citas ac
@@ -24,7 +24,7 @@ async function findById(id) {
     .input('id', id)
     .query(`
       SELECT ac.id_asignacion, ac.matriculo,
-             a.id_aspirante, a.nombres, a.apellidos, a.email,
+             a.id_aspirante, a.nombre, a.apellidos, a.email,
              cm.id_cita, cm.fecha, cm.hora_inicio, cm.hora_fin,
              c.id_carrera, c.nombre_carrera
       FROM asignacion_citas ac
@@ -43,7 +43,7 @@ async function findByCarrera(id_carrera) {
     .input('id_carrera', id_carrera)
     .query(`
       SELECT ac.id_asignacion, ac.matriculo,
-             a.id_aspirante, a.nombres, a.apellidos, a.email,
+             a.id_aspirante, a.nombre, a.apellidos, a.email,
              cm.id_cita, cm.fecha, cm.hora_inicio, cm.hora_fin,
              c.id_carrera, c.nombre_carrera
       FROM asignacion_citas ac
@@ -86,10 +86,6 @@ async function remove(id) {
   return result.rowsAffected[0] > 0;
 }
 
-
-
-// Agrega esta función al final del archivo, antes de module.exports
-
 // Obtener horarios disponibles (citas_matricula que no están asignadas)
 async function findHorariosDisponibles() {
   const pool = await getPool();
@@ -108,7 +104,7 @@ async function findHorariosDisponibles() {
     FROM citas_matricula cm
     INNER JOIN carreras c ON cm.id_carrera = c.id_carrera
     LEFT JOIN asignacion_citas ac ON cm.id_cita = ac.id_cita
-    WHERE ac.id_asignacion IS NULL  -- Solo las no asignadas
+    WHERE ac.id_asignacion IS NULL
     ORDER BY cm.fecha, cm.hora_inicio
   `);
   return result.recordset;
@@ -136,7 +132,6 @@ async function findHorariosDisponiblesByCarrera(id_carrera) {
   return result.recordset;
 }
 
-
 module.exports = { 
     findAll,
     findById, 
@@ -147,11 +142,3 @@ module.exports = {
     findHorariosDisponibles,
     findHorariosDisponiblesByCarrera
 };
-
-
-
-
-
-
-
-
