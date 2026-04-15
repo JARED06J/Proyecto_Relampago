@@ -13,7 +13,10 @@ async function getByCarrera(req, res, next) {
 }
 
 async function create(req, res, next) {
-  try { res.status(201).json(await service.crearAsignacion(req.body)); } catch (err) { next(err); }
+  try {
+    console.log('POST /api/citas body recibido:', JSON.stringify(req.body));
+    res.status(201).json(await service.crearAsignacion(req.body));
+  } catch (err) { next(err); }
 }
 
 async function updateMatriculo(req, res, next) {

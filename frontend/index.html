@@ -547,7 +547,7 @@
     const carreras = await api('/carreras').catch(() => []);
     const sel = document.getElementById('asp-carrera-sel');
     sel.innerHTML = '<option value="">Selecciona una carrera</option>';
-    carreras.forEach(c => sel.innerHTML += `<option value="${c.id}">${c.nombre}</option>`);
+    carreras.forEach(c => sel.innerHTML += `<option value="${c.id_carrera}">${c.nombre_carrera}</option>`);
   }
 
   async function solicitarCita() {

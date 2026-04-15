@@ -155,4 +155,3 @@ module.exports = {
 
 
 
-module.exports = { findAll, findById, findByCarrera, create, updateMatriculo, remove };

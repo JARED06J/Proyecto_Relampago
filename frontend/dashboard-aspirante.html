@@ -1,524 +1,781 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mi Perfil - Sistema de Citas de Matrícula</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Citas de Matrícula</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f1f5f9; color: #1e293b; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
-        }
+    /* ── NAV ── */
+    .nav { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 56px; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; font-weight: 700; color: #1e40af; font-size: 15px; }
+    .nav-brand-icon { background: #1e40af; color: #fff; border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+    .nav-sub { font-size: 11px; color: #64748b; font-weight: 400; }
+    .nav-tabs { display: flex; gap: 4px; }
+    .nav-tab { padding: 6px 18px; border-radius: 6px; border: 1px solid #e2e8f0; background: #fff; cursor: pointer; font-size: 13px; color: #64748b; transition: all .15s; }
+    .nav-tab.active, .nav-tab:hover { background: #1e40af; color: #fff; border-color: #1e40af; }
+    .btn-session { font-size: 13px; color: #64748b; background: none; border: 1px solid #e2e8f0; border-radius: 6px; padding: 5px 14px; cursor: pointer; }
+    .btn-session:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
 
-        .navbar {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
+    /* ── VIEWS ── */
+    .view { display: none; }
+    .view.active { display: block; }
 
-        .logo h2 {
-            font-size: 20px;
-        }
+    /* ── LOGIN ── */
+    .login-wrap { min-height: calc(100vh - 56px); display: flex; align-items: center; justify-content: center; background: #f1f5f9; }
+    .login-card { background: #fff; border-radius: 14px; padding: 40px 36px; width: 380px; box-shadow: 0 4px 24px rgba(0,0,0,.08); }
+    .login-icon { width: 52px; height: 52px; background: #1e40af; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 16px; }
+    .login-title { text-align: center; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .login-sub { text-align: center; font-size: 13px; color: #64748b; margin-bottom: 24px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #374151; }
+    .form-input, .form-select { width: 100%; border: 1px solid #d1d5db; border-radius: 8px; padding: 9px 12px; font-size: 14px; outline: none; transition: border .15s; }
+    .form-input:focus, .form-select:focus { border-color: #1e40af; box-shadow: 0 0 0 3px rgba(30,64,175,.1); }
+    .btn-primary { width: 100%; background: #1e40af; color: #fff; border: none; border-radius: 8px; padding: 11px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .15s; }
+    .btn-primary:hover { background: #1e3a8a; }
+    .login-footer { text-align: center; font-size: 12px; color: #94a3b8; margin-top: 24px; }
 
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin-left: 25px;
-            padding: 8px 15px;
-            border-radius: 8px;
-            transition: background 0.3s;
-            cursor: pointer;
-        }
+    /* ── ENCARGADO ── */
+    .enc-wrap { max-width: 1100px; margin: 28px auto; padding: 0 20px; }
+    .enc-user { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .enc-avatar { width: 36px; height: 36px; background: #dbeafe; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #1e40af; font-size: 16px; }
+    .enc-name { font-weight: 600; font-size: 14px; }
+    .enc-role { font-size: 12px; color: #64748b; }
 
-        .nav-links a:hover {
-            background: rgba(255,255,255,0.2);
-        }
+    /* stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+    .stat-card { background: #fff; border-radius: 10px; padding: 18px 20px; display: flex; align-items: center; gap: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    .stat-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+    .stat-icon.blue { background: #dbeafe; }
+    .stat-icon.green { background: #dcfce7; }
+    .stat-icon.red { background: #fee2e2; }
+    .stat-icon.yellow { background: #fef9c3; }
+    .stat-num { font-size: 26px; font-weight: 800; line-height: 1; }
+    .stat-label { font-size: 12px; color: #64748b; margin-top: 2px; }
 
-        .container {
-            max-width: 1200px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
+    /* tabs */
+    .tabs-bar { display: flex; gap: 6px; margin-bottom: 20px; }
+    .tab-btn { padding: 8px 20px; border-radius: 8px; border: 1px solid #e2e8f0; background: #fff; cursor: pointer; font-size: 13px; color: #64748b; font-weight: 500; display: flex; align-items: center; gap: 6px; }
+    .tab-btn.active { background: #1e40af; color: #fff; border-color: #1e40af; }
+    .tab-btn:hover:not(.active) { background: #f8fafc; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
 
-        .profile-header {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            flex-wrap: wrap;
-        }
+    /* card */
+    .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.07); overflow: hidden; }
+    .card-header { padding: 18px 22px 0; }
+    .card-title { font-size: 15px; font-weight: 700; }
+    .card-sub { font-size: 12px; color: #64748b; margin-top: 2px; }
+    .card-body { padding: 18px 22px; }
 
-        .avatar {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
-            color: white;
-        }
+    /* table */
+    .table-toolbar { display: flex; gap: 10px; align-items: center; padding: 14px 22px; border-bottom: 1px solid #f1f5f9; flex-wrap: wrap; }
+    .search-box { flex: 1; min-width: 180px; position: relative; }
+    .search-box input { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 7px 12px 7px 32px; font-size: 13px; outline: none; }
+    .search-box::before { content: '🔍'; position: absolute; left: 10px; top: 7px; font-size: 13px; }
+    .filter-select { border: 1px solid #e2e8f0; border-radius: 8px; padding: 7px 12px; font-size: 13px; outline: none; background: #fff; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { background: #f8fafc; }
+    th { padding: 11px 14px; text-align: left; font-weight: 600; color: #475569; font-size: 12px; border-bottom: 1px solid #e2e8f0; }
+    td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; }
+    tr:last-child td { border-bottom: none; }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+    .badge-green { background: #dcfce7; color: #16a34a; }
+    .badge-yellow { background: #fef9c3; color: #ca8a04; }
+    .badge-red { background: #fee2e2; color: #dc2626; }
+    .badge-blue { background: #dbeafe; color: #1d4ed8; }
+    .action-btn { background: none; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 12px; color: #475569; }
+    .action-btn:hover { background: #f1f5f9; }
+    .table-footer { padding: 12px 22px; font-size: 12px; color: #64748b; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
+    .empty-msg { text-align: center; padding: 40px; color: #94a3b8; font-size: 14px; }
 
-        .profile-info h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
+    /* Configurar Fechas */
+    .fechas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .matricula-list { margin-bottom: 20px; }
+    .mat-item { border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px 18px; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+    .mat-item.activa { border-color: #4ade80; background: #f0fdf4; }
+    .mat-info h4 { font-size: 14px; font-weight: 600; }
+    .mat-info p { font-size: 12px; color: #64748b; margin-top: 3px; }
+    .mat-actions { display: flex; gap: 8px; }
+    .btn-sm { padding: 5px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; }
+    .btn-edit { background: #dbeafe; color: #1d4ed8; }
+    .btn-activate { background: #dcfce7; color: #16a34a; }
+    .btn-deactivate { background: #fee2e2; color: #dc2626; }
 
-        .profile-info p {
-            color: #666;
-            margin: 5px 0;
-        }
+    /* Form matricula */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-grid .full { grid-column: 1 / -1; }
+    .btn-save { background: #1e40af; color: #fff; border: none; border-radius: 8px; padding: 10px 28px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+    .btn-save:hover { background: #1e3a8a; }
+    .btn-cancel-edit { background: #f1f5f9; color: #475569; border: none; border-radius: 8px; padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 8px; margin-left: 8px; }
 
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
-        }
+    /* Correos */
+    .correos-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .correo-result { margin-top: 14px; padding: 12px 16px; border-radius: 8px; font-size: 13px; display: none; }
+    .correo-result.ok { background: #dcfce7; color: #16a34a; display: block; }
+    .correo-result.err { background: #fee2e2; color: #dc2626; display: block; }
+    textarea.form-input { resize: vertical; min-height: 90px; }
+    .aspirantes-check { max-height: 180px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; }
+    .asp-check-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; font-size: 13px; border-bottom: 1px solid #f1f5f9; }
+    .asp-check-item:last-child { border-bottom: none; }
+    .btn-send { background: #1e40af; color: #fff; border: none; border-radius: 8px; padding: 10px 28px; font-size: 14px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 10px; }
+    .btn-send:hover { background: #1e3a8a; }
+    .loading { opacity: .6; pointer-events: none; }
 
-        .card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            transition: transform 0.3s;
-        }
+    /* Toast */
+    .toast { position: fixed; bottom: 24px; right: 24px; background: #1e293b; color: #fff; padding: 12px 20px; border-radius: 10px; font-size: 13px; z-index: 1000; display: none; box-shadow: 0 4px 16px rgba(0,0,0,.2); }
+    .toast.show { display: block; animation: fadeIn .2s; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card:hover {
-            transform: translateY(-5px);
-        }
+    /* carrera selector */
+    .carrera-selector { display: flex; gap: 10px; align-items: center; padding: 14px 22px; border-bottom: 1px solid #f1f5f9; flex-wrap: wrap; }
+    .carrera-selector label { font-size: 13px; font-weight: 600; color: #374151; }
 
-        .card h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        .card p {
-            color: #666;
-            line-height: 1.6;
-        }
-
-        .btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-top: 15px;
-            transition: transform 0.2s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-        }
-
-        .cita-card {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border-left: 4px solid #667eea;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-        }
-
-        .modal-content input, .modal-content select, .modal-content textarea {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-
-        .close {
-            float: right;
-            font-size: 28px;
-            cursor: pointer;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-
-        .error-message {
-            background: #fee;
-            color: #c33;
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #333;
-        }
-
-        .form-group small {
-            color: #666;
-            font-size: 12px;
-        }
-    </style>
+    @media (max-width: 700px) {
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+      .fechas-grid, .correos-wrap, .form-grid { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
-    <div class="navbar">
-        <div class="logo">
-            <h2>Sistema de Citas de Matrícula</h2>
+
+<!-- ══════════ NAV ══════════ -->
+<nav class="nav">
+  <div class="nav-brand">
+    <div class="nav-brand-icon">🎓</div>
+    <div>
+      Sistema de Citas de Matrícula
+      <div class="nav-sub">Módulo del Proyecto</div>
+    </div>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showView('login')">🔑 Login</button>
+    <button class="nav-tab" onclick="showView('aspirante')">👤 Aspirante</button>
+    <button class="nav-tab" onclick="showView('encargado')">📋 Encargado</button>
+    <button class="nav-tab" onclick="showView('director')">📊 Director</button>
+  </div>
+  <button class="btn-session" id="btn-session" onclick="cerrarSesion()" style="display:none">↩ Cerrar Sesión</button>
+</nav>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div id="view-login" class="view active">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-icon">🎓</div>
+      <div class="login-title">Sistema de Citas de Matrícula</div>
+      <div class="login-sub">Sesión integral del proceso de matrícula universitaria</div>
+      <div style="background:#fee2e2;color:#dc2626;border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:16px;display:none" id="login-error"></div>
+      <div class="form-group">
+        <label class="form-label">Tipo de Usuario</label>
+        <select class="form-select" id="login-tipo">
+          <option value="">Seleccione su rol</option>
+          <option value="aspirante">Aspirante</option>
+          <option value="encargado">Encargado de Matrícula</option>
+          <option value="director">Director</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Correo Electrónico</label>
+        <input class="form-input" id="login-email" type="email" placeholder="usuario@universidad.edu" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Contraseña</label>
+        <input class="form-input" id="login-pass" type="password" placeholder="••••••" />
+      </div>
+      <button class="btn-primary" onclick="iniciarSesion()">Ingresar →</button>
+      <div class="login-footer">© 2024 Universidad. Todos los derechos reservados.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ASPIRANTE ══════════ -->
+<div id="view-aspirante" class="view">
+  <div class="enc-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">
+      <div class="enc-user">
+        <div class="enc-avatar">👤</div>
+        <div>
+          <div class="enc-name" id="asp-name">Aspirante</div>
+          <div class="enc-role" id="asp-id">—</div>
         </div>
-        <div class="nav-links">
-            <a onclick="showPerfil()">Mi Perfil</a>
-            <a onclick="showCitas()">Mis Citas</a>
-            <a onclick="logout()">Cerrar Sesión</a>
+      </div>
+    </div>
+    <!-- cards estado -->
+    <div class="stats-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div class="stat-card">
+        <div class="stat-icon yellow">⚠️</div>
+        <div><div class="stat-num" id="asp-estado-txt">Sin Cita</div><div class="stat-label">Estado</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green">🎓</div>
+        <div><div class="stat-num" id="asp-carrera-txt">—</div><div class="stat-label">Carrera de Interés</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon blue">📅</div>
+        <div><div class="stat-num" id="asp-fecha-txt">Pendiente</div><div class="stat-label">Fecha Cita</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon yellow">🕐</div>
+        <div><div class="stat-num" id="asp-hora-txt">—</div><div class="stat-label">Hora</div></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px">
+      <!-- Solicitar cita -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">📅 Solicitar Cita de Matrícula</div><div class="card-sub">Complete el formulario para agendar su cita de matrícula</div></div>
+        <div class="card-body">
+          <div class="form-group">
+            <label class="form-label">Carrera de Interés</label>
+            <select class="form-select" id="asp-carrera-sel"><option value="">Selecciona una carrera</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Comentarios Adicionales</label>
+            <textarea class="form-input" id="asp-notas" placeholder="Escriba cualquier comentario o pregunta..." style="min-height:80px"></textarea>
+          </div>
+          <button class="btn-primary" onclick="solicitarCita()">📅 Solicitar Cita</button>
+          <div id="asp-result" class="correo-result"></div>
         </div>
+      </div>
+      <!-- Estado cita -->
+      <div class="card">
+        <div class="card-header"><div class="card-title">📋 Estado de mi Cita</div><div class="card-sub">Información sobre su cita programada</div></div>
+        <div class="card-body" id="asp-cita-info">
+          <div class="empty-msg">📭<br>Sin cita programada<br><span style="font-size:12px">Complete el formulario para solicitar su cita de matrícula</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ ENCARGADO ══════════ -->
+<div id="view-encargado" class="view">
+  <div class="enc-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div class="enc-user">
+        <div class="enc-avatar">📋</div>
+        <div>
+          <div class="enc-name">Encargado de Matrícula</div>
+          <div class="enc-role">Gestión del proceso de citas</div>
+        </div>
+      </div>
     </div>
 
-    <div class="container">
-        <div class="profile-header" id="profileHeader">
-            <div class="avatar" id="avatarInicial">JP</div>
-            <div class="profile-info" id="profileInfo">
-                <h1 id="nombreCompleto">Cargando...</h1>
-                <p>📧 <span id="userEmail">-</span></p>
-                <p>📱 <span id="userTelefono">-</span></p>
-                <p>🎓 Carrera: <span id="userCarrera">-</span></p>
-                <p>🆔 ID: <span id="userId">-</span></p>
-            </div>
-        </div>
-
-        <div class="cards" id="cardsSection">
-            <div class="card">
-                <h3>📅 Solicitar Cita de Matrícula</h3>
-                <p>Agenda una cita para completar tu proceso de matrícula con nuestros asesores académicos.</p>
-                <button class="btn" onclick="abrirModalCita()">Solicitar Cita</button>
-            </div>
-
-            <div class="card">
-                <h3>📝 Estado de Matrícula</h3>
-                <p>Estado actual: <strong id="estadoMatricula">Pendiente</strong></p>
-                <p>Próximo paso: Completar solicitud de cita</p>
-                <button class="btn btn-secondary" onclick="verDetalles()">Ver Detalles</button>
-            </div>
-
-            <div class="card">
-                <h3>ℹ️ Información Importante</h3>
-                <p>• Documentos necesarios: DUI, Partida de Nacimiento<br>
-                • Fechas de matrícula: 15-30 de cada mes<br>
-                • Horario de atención: 8:00 AM - 4:00 PM</p>
-            </div>
-        </div>
-
-        <div class="card" id="misCitas" style="display: none;">
-            <h3>📋 Mis Citas Agendadas</h3>
-            <div id="listaCitas"></div>
-        </div>
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon blue">📅</div><div><div class="stat-num" id="st-total">—</div><div class="stat-label">Total Citas</div></div></div>
+      <div class="stat-card"><div class="stat-icon green">✅</div><div><div class="stat-num" id="st-conf">—</div><div class="stat-label">Confirmadas</div></div></div>
+      <div class="stat-card"><div class="stat-icon red">❌</div><div><div class="stat-num" id="st-canc">—</div><div class="stat-label">Canceladas</div></div></div>
+      <div class="stat-card"><div class="stat-icon yellow">⏳</div><div><div class="stat-num" id="st-pend">—</div><div class="stat-label">Pendientes</div></div></div>
     </div>
 
-    <!-- Modal para solicitar cita -->
-    <div id="modalCita" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="cerrarModalCita()">&times;</span>
-            <h3>Solicitar Cita de Matrícula</h3>
-            <form id="formCita">
-                <div class="form-group">
-                    <label>Horario Disponible *</label>
-                    <select id="id_cita" required>
-                        <option value="">Cargando horarios...</option>
-                    </select>
-                    <small>Seleccione el horario disponible para su cita</small>
-                </div>
-                
-                <div class="form-group">
-                    <label>Comentarios Adicionales</label>
-                    <textarea id="comentarios" rows="3" placeholder="Escriba cualquier comentario o pregunta..."></textarea>
-                </div>
-                
-                <button type="submit" class="btn">Solicitar Cita</button>
-            </form>
-        </div>
+    <!-- Tabs -->
+    <div class="tabs-bar">
+      <button class="tab-btn active" onclick="showTab('tab-listado')">📋 Listado de Citas</button>
+      <button class="tab-btn" onclick="showTab('tab-fechas')">⚙️ Configurar Fechas</button>
+      <button class="tab-btn" onclick="showTab('tab-correos')">✉️ Correos Masivos</button>
     </div>
 
-    <script>
-        // URL de la API
-        const API_URL = 'http://localhost:3000/api';
-        
-        // Variable global para el aspirante actual
-        let aspiranteActual = null;
-        
-        // Cargar datos del aspirante
-        async function cargarDatosAspirante() {
-            const savedAspirante = localStorage.getItem('aspiranteActual');
-            
-            if (savedAspirante) {
-                aspiranteActual = JSON.parse(savedAspirante);
-                actualizarUI();
-                await cargarMisCitas();
-            } else {
-                const userId = localStorage.getItem('userId');
-                if (userId) {
-                    try {
-                        const response = await fetch(`${API_URL}/aspirantes/${userId}`);
-                        if (response.ok) {
-                            aspiranteActual = await response.json();
-                            localStorage.setItem('aspiranteActual', JSON.stringify(aspiranteActual));
-                            actualizarUI();
-                            await cargarMisCitas();
-                            return;
-                        }
-                    } catch (error) {
-                        console.log('Error cargando datos:', error);
-                    }
-                }
-                mostrarDatosDemo();
-            }
-        }
-        
-        function mostrarDatosDemo() {
-            aspiranteActual = {
-                id_aspirante: 1,
-                nombre: 'Juan',
-                apellidos: 'Pérez Gómez',
-                email: localStorage.getItem('userEmail') || 'juan.perez@universidad.edu',
-                telefono: '+503 7000 0000',
-                id_carrera_elegida: 1
-            };
-            actualizarUI();
-        }
-        
-        function actualizarUI() {
-            if (!aspiranteActual) return;
-            
-            const nombreCompleto = `${aspiranteActual.nombre || ''} ${aspiranteActual.apellidos || ''}`;
-            document.getElementById('nombreCompleto').textContent = nombreCompleto || 'Aspirante';
-            document.getElementById('userEmail').textContent = aspiranteActual.email || 'No registrado';
-            document.getElementById('userTelefono').textContent = aspiranteActual.telefono || 'No registrado';
-            document.getElementById('userId').textContent = aspiranteActual.id_aspirante || '-';
-            
-            const iniciales = (aspiranteActual.nombre?.charAt(0) || 'A') + (aspiranteActual.apellidos?.charAt(0) || '');
-            document.getElementById('avatarInicial').textContent = iniciales.toUpperCase();
-            
-            const carreras = {
-                1: 'Ingeniería en Sistemas',
-                2: 'Ingeniería Civil',
-                3: 'Administración de Empresas',
-                4: 'Derecho',
-                5: 'Medicina',
-                6: 'Arquitectura'
-            };
-            document.getElementById('userCarrera').textContent = carreras[aspiranteActual.id_carrera_elegida] || 'No seleccionada';
-        }
-        
-        function showPerfil() {
-            document.getElementById('misCitas').style.display = 'none';
-            document.getElementById('cardsSection').style.display = 'grid';
-            document.getElementById('profileHeader').style.display = 'flex';
-        }
-        
-        async function showCitas() {
-            document.getElementById('misCitas').style.display = 'block';
-            document.getElementById('cardsSection').style.display = 'none';
-            document.getElementById('profileHeader').style.display = 'none';
-            await cargarMisCitas();
-        }
-        
-        // Cargar citas del aspirante
-        async function cargarMisCitas() {
-            const lista = document.getElementById('listaCitas');
-            lista.innerHTML = '<div class="loading">Cargando sus citas...</div>';
-            
-            try {
-                const response = await fetch(`${API_URL}/citas`);
-                
-                if (response.ok) {
-                    const todasLasCitas = await response.json();
-                    const misCitas = todasLasCitas.filter(cita => cita.id_aspirante === aspiranteActual?.id_aspirante);
-                    
-                    if (misCitas.length === 0) {
-                        lista.innerHTML = '<p>No tienes citas agendadas.</p>';
-                        return;
-                    }
-                    
-                    lista.innerHTML = misCitas.map(cita => `
-                        <div class="cita-card">
-                            <strong>📅 Cita #${cita.id_asignacion || cita.id}</strong><br>
-                            Fecha: ${cita.fecha || 'No disponible'}<br>
-                            Hora: ${cita.hora_inicio ? `${cita.hora_inicio} a ${cita.hora_fin}` : 'No disponible'}<br>
-                            Estado: ${cita.estado || 'Pendiente'}<br>
-                            Matrículo: ${cita.matriculo ? 'Asignado' : 'Pendiente'}
-                        </div>
-                    `).join('');
-                } else {
-                    lista.innerHTML = '<p class="error-message">Error al cargar sus citas</p>';
-                }
-            } catch (error) {
-                console.error('Error cargando citas:', error);
-                lista.innerHTML = '<p class="error-message">Error de conexión. Intente más tarde.</p>';
-            }
-        }
-        
-        // Cargar horarios disponibles desde la API
-        async function cargarHorariosDisponibles() {
-            const select = document.getElementById('id_cita');
-            select.innerHTML = '<option value="">Cargando horarios...</option>';
-            
-            try {
-                const response = await fetch(`${API_URL}/citas/disponibles`);
-                
-                if (response.ok) {
-                    const horarios = await response.json();
-                    
-                    if (horarios && horarios.length > 0) {
-                        select.innerHTML = '<option value="">Seleccione un horario</option>';
-                        
-                        horarios.forEach(horario => {
-                            const option = document.createElement('option');
-                            option.value = horario.id_cita;
-                            const fecha = horario.fecha || 'Fecha no disponible';
-                            const horaInicio = horario.hora_inicio || 'Hora no disponible';
-                            const horaFin = horario.hora_fin ? ` a ${horario.hora_fin}` : '';
-                            const carrera = horario.nombre_carrera ? ` - ${horario.nombre_carrera}` : '';
-                            option.textContent = `${fecha} - ${horaInicio}${horaFin}${carrera}`;
-                            select.appendChild(option);
-                        });
-                    } else {
-                        select.innerHTML = '<option value="">No hay horarios disponibles</option>';
-                    }
-                } else {
-                    select.innerHTML = '<option value="">Error cargando horarios</option>';
-                }
-            } catch (error) {
-                console.error('Error cargando horarios:', error);
-                select.innerHTML = '<option value="">Error de conexión</option>';
-            }
-        }
-        
-        function abrirModalCita() {
-            cargarHorariosDisponibles();
-            document.getElementById('modalCita').style.display = 'flex';
-        }
-        
-        function cerrarModalCita() {
-            document.getElementById('modalCita').style.display = 'none';
-            document.getElementById('formCita').reset();
-        }
-        
-        // Enviar solicitud de cita al backend
-        document.getElementById('formCita')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (!aspiranteActual || !aspiranteActual.id_aspirante) {
-                alert('Debes iniciar sesión primero');
-                window.location.href = 'login-aspirante.html';
-                return;
-            }
-            
-            const id_cita = document.getElementById('id_cita').value;
-            const comentarios = document.getElementById('comentarios').value;
-            
-            if (!id_cita) {
-                alert('Por favor seleccione un horario disponible');
-                return;
-            }
-            
-            const citaData = {
-                id_aspirante: parseInt(aspiranteActual.id_aspirante),
-                id_cita: parseInt(id_cita)
-            };
-            
-            const btnSubmit = e.target.querySelector('button[type="submit"]');
-            const textoOriginal = btnSubmit.textContent;
-            btnSubmit.textContent = 'Enviando...';
-            btnSubmit.disabled = true;
-            
-            try {
-                const response = await fetch(`${API_URL}/citas`, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(citaData)
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    alert('¡Cita solicitada exitosamente!');
-                    cerrarModalCita();
-                    await cargarMisCitas();
-                } else {
-                    const error = await response.json();
-                    console.error('Error del servidor:', error);
-                    alert('Error al solicitar cita: ' + (error.message || 'Error desconocido'));
-                }
-            } catch (error) {
-                console.error('Error de conexión:', error);
-                alert('Error de conexión con el servidor');
-            } finally {
-                btnSubmit.textContent = textoOriginal;
-                btnSubmit.disabled = false;
-            }
-        });
-        
-        function verDetalles() {
-            alert('Su solicitud está siendo procesada. Recibirá un correo con los próximos pasos.');
-        }
-        
-        function logout() {
-            localStorage.removeItem('aspiranteActual');
-            localStorage.removeItem('userEmail');
-            localStorage.removeItem('userToken');
-            localStorage.removeItem('userId');
-            window.location.href = 'login-aspirante.html';
-        }
-        
-        // Inicializar al cargar la página
-        cargarDatosAspirante();
-    </script>
+    <!-- ── TAB 1: LISTADO DE CITAS POR CARRERA ── -->
+    <div id="tab-listado" class="tab-pane active">
+      <div class="card">
+        <div class="card-header" style="padding-bottom:0">
+          <div class="card-title">Listado de Citas por Carrera</div>
+          <div class="card-sub">Consulte las citas y el estado de matrícula de los aspirantes</div>
+        </div>
+        <div class="carrera-selector">
+          <label>Carrera:</label>
+          <select class="filter-select" id="filtro-carrera" onchange="cargarCitasPorCarrera()">
+            <option value="">— Seleccione una carrera —</option>
+          </select>
+          <select class="filter-select" id="filtro-estado" onchange="filtrarTabla()">
+            <option value="">Todos los estados</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="confirmada">Confirmada</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+        </div>
+        <div class="table-toolbar">
+          <div class="search-box"><input type="text" id="search-citas" placeholder="Buscar por nombre o correo..." oninput="filtrarTabla()" /></div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr><th>Aspirante</th><th>Carrera</th><th>Fecha</th><th>Horario</th><th>Matrículado</th><th>Acciones</th></tr>
+            </thead>
+            <tbody id="tbody-citas">
+              <tr><td colspan="6" class="empty-msg">Seleccione una carrera para ver las citas</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span id="citas-count">0 citas</span>
+          <div style="display:flex;gap:6px">
+            <button class="action-btn" id="btn-prev" onclick="cambiarPagina(-1)">← Anterior</button>
+            <button class="action-btn" id="btn-next" onclick="cambiarPagina(1)">Siguiente →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB 2: CONFIGURAR FECHAS ── -->
+    <div id="tab-fechas" class="tab-pane">
+      <div class="fechas-grid">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Períodos de Matrícula</div><div class="card-sub">Gestione los periodos de inicio y fin</div></div>
+          <div class="card-body">
+            <div id="matricula-list" class="matricula-list"><div class="empty-msg">Cargando períodos...</div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title" id="form-mat-title">Nuevo Período de Matrícula</div><div class="card-sub">Asigne la fecha y hora de inicio y fin</div></div>
+          <div class="card-body">
+            <input type="hidden" id="mat-id" value="" />
+            <div class="form-grid">
+              <div class="form-group full">
+                <label class="form-label">Carrera</label>
+                <select class="form-select" id="mat-carrera"><option value="">Seleccione una carrera</option></select>
+              </div>
+              <div class="form-group full">
+                <label class="form-label">📅 Fecha</label>
+                <input class="form-input" id="mat-fecha" type="date" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">🕐 Hora de INICIO</label>
+                <input class="form-input" id="mat-inicio" type="time" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">🕐 Hora de FIN</label>
+                <input class="form-input" id="mat-fin" type="time" />
+              </div>
+            </div>
+            <div id="mat-result" class="correo-result"></div>
+            <button class="btn-save" onclick="guardarMatricula()">💾 Guardar Período</button>
+            <button class="btn-cancel-edit" id="btn-cancel-mat" style="display:none" onclick="cancelarEdicionMat()">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TAB 3: CORREOS MASIVOS ── -->
+    <div id="tab-correos" class="tab-pane">
+      <div class="correos-wrap">
+        <div class="card">
+          <div class="card-header"><div class="card-title">✉️ Envío Masivo</div><div class="card-sub">Notificar a aspirantes sobre apertura de matrícula</div></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Período de Matrícula</label>
+              <select class="form-select" id="correo-matricula"><option value="">Seleccione un período</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Destinatarios (aspirantes)</label>
+              <div class="aspirantes-check" id="aspirantes-check"><div style="font-size:13px;color:#94a3b8">Cargando aspirantes...</div></div>
+            </div>
+            <div class="form-group" style="margin-top:8px">
+              <label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer">
+                <input type="checkbox" id="sel-todos" onchange="seleccionarTodos(this.checked)" /> Seleccionar todos
+              </label>
+            </div>
+            <div id="masivo-result" class="correo-result"></div>
+            <button class="btn-send" onclick="enviarCorreoMasivo()">📨 Enviar Correos</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">📧 Correo Personalizado</div><div class="card-sub">Enviar un correo a un destinatario específico</div></div>
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Para (email)</label>
+              <input class="form-input" id="correo-to" type="email" placeholder="destinatario@correo.com" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Asunto</label>
+              <input class="form-input" id="correo-asunto" placeholder="Asunto del correo" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mensaje</label>
+              <textarea class="form-input" id="correo-msg" placeholder="Escriba el mensaje aquí..."></textarea>
+            </div>
+            <div id="manual-result" class="correo-result"></div>
+            <button class="btn-send" onclick="enviarCorreoManual()">📤 Enviar Correo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ DIRECTOR ══════════ -->
+<div id="view-director" class="view">
+  <div class="enc-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div class="enc-user">
+        <div class="enc-avatar">📊</div>
+        <div>
+          <div class="enc-name">Director</div>
+          <div class="enc-role" id="dir-carrera-label">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-icon blue">👥</div><div><div class="stat-num" id="dir-total">—</div><div class="stat-label">Total Aspirantes</div></div></div>
+      <div class="stat-card"><div class="stat-icon green">✅</div><div><div class="stat-num" id="dir-conf">—</div><div class="stat-label">Confirmadas</div></div></div>
+      <div class="stat-card"><div class="stat-icon red">❌</div><div><div class="stat-num" id="dir-canc">—</div><div class="stat-label">Canceladas</div></div></div>
+      <div class="stat-card"><div class="stat-icon yellow">📅</div><div><div class="stat-num" id="dir-pend">—</div><div class="stat-label">Pendientes</div></div></div>
+    </div>
+    <div class="card" style="margin-top:20px">
+      <div class="card-header"><div class="card-title">Aspirantes por Carrera</div><div class="card-sub">Consulte y gestione los aspirantes matriculados de su carrera</div></div>
+      <div class="carrera-selector">
+        <label>Carrera:</label>
+        <select class="filter-select" id="dir-carrera-sel" onchange="cargarCitasDirector()">
+          <option value="">— Seleccione —</option>
+        </select>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr><th>Aspirante</th><th>Email</th><th>Fecha</th><th>Estado</th></tr></thead>
+          <tbody id="dir-tbody"><tr><td colspan="4" class="empty-msg">Seleccione una carrera</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+  let citasData = [];
+  let paginaActual = 1;
+  const POR_PAGINA = 10;
+  let matriculas = [];
+  let aspirantes = [];
+  let editandoMatId = null;
+
+  function toast(msg, ok = true) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.style.background = ok ? '#1e293b' : '#dc2626';
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3000);
+  }
+
+  function fmtFecha(dt) {
+    if (!dt) return '—';
+    return new Date(dt).toLocaleDateString('es-CR');
+  }
+
+  function fmtHora(t) {
+    if (!t) return '—';
+    return String(t).slice(0, 5);
+  }
+
+  function badgeMatriculo(val) {
+    if (val === null || val === undefined) return `<span class="badge badge-yellow">Pendiente</span>`;
+    return val ? `<span class="badge badge-green">Sí</span>` : `<span class="badge badge-red">No</span>`;
+  }
+
+  async function api(path, opts = {}) {
+    const res = await fetch(API + path, { headers: { 'Content-Type': 'application/json' }, ...opts });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || data.message || 'Error del servidor');
+    return data;
+  }
+
+  function showView(v) {
+    document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+    document.getElementById('view-' + v).classList.add('active');
+    const idx = ['login', 'aspirante', 'encargado', 'director'].indexOf(v);
+    if (idx >= 0) document.querySelectorAll('.nav-tab')[idx].classList.add('active');
+  }
+
+  function showTab(id) {
+    document.querySelectorAll('.tab-pane').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    const idx = ['tab-listado', 'tab-fechas', 'tab-correos'].indexOf(id);
+    if (idx >= 0) document.querySelectorAll('.tab-btn')[idx].classList.add('active');
+  }
+
+  function iniciarSesion() {
+    const tipo = document.getElementById('login-tipo').value;
+    const email = document.getElementById('login-email').value.trim();
+    const errEl = document.getElementById('login-error');
+    if (!tipo || !email) { errEl.textContent = 'Complete todos los campos'; errEl.style.display = 'block'; return; }
+    errEl.style.display = 'none';
+    document.getElementById('btn-session').style.display = 'block';
+    localStorage.setItem('userEmail', email);
+    localStorage.setItem('userTipo', tipo);
+    if (tipo === 'encargado') { showView('encargado'); iniciarEncargado(); }
+    else if (tipo === 'aspirante') { showView('aspirante'); iniciarAspirante(email); }
+    else if (tipo === 'director') { showView('director'); iniciarDirector(); }
+  }
+
+  function cerrarSesion() {
+    localStorage.clear();
+    document.getElementById('btn-session').style.display = 'none';
+    showView('login');
+    document.getElementById('login-email').value = '';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('login-tipo').value = '';
+  }
+
+  async function iniciarAspirante(email) {
+    const carreras = await api('/carreras').catch(() => []);
+    const sel = document.getElementById('asp-carrera-sel');
+    sel.innerHTML = '<option value="">Selecciona una carrera</option>';
+    carreras.forEach(c => sel.innerHTML += `<option value="${c.id_carrera}">${c.nombre_carrera}</option>`);
+    try {
+      const aspirantesLista = await api('/aspirantes');
+      const aspirante = aspirantesLista.find(a => a.email === email);
+      if (aspirante) {
+        localStorage.setItem('aspiranteActual', JSON.stringify(aspirante));
+        document.getElementById('asp-name').textContent = `${aspirante.nombres || aspirante.nombre} ${aspirante.apellidos || ''}`;
+        document.getElementById('asp-id').textContent = `ID: ${aspirante.id_aspirante}`;
+        await cargarCitaAspirante(aspirante.id_aspirante);
+      }
+    } catch (e) { console.error(e); }
+  }
+
+  async function cargarCitaAspirante(id_aspirante) {
+    try {
+      const citas = await api('/citas');
+      const miCita = citas.find(c => c.id_aspirante === id_aspirante);
+      if (miCita) {
+        document.getElementById('asp-estado-txt').textContent = miCita.matriculo ? 'Matriculado' : 'Con Cita';
+        document.getElementById('asp-fecha-txt').textContent = fmtFecha(miCita.fecha);
+        document.getElementById('asp-hora-txt').textContent = fmtHora(miCita.hora_inicio);
+        document.getElementById('asp-cita-info').innerHTML = `
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div><span style="color:#64748b">Carrera:</span> <strong>${miCita.nombre_carrera || '—'}</strong></div>
+            <div><span style="color:#64748b">Fecha:</span> <strong>${fmtFecha(miCita.fecha)}</strong></div>
+            <div><span style="color:#64748b">Hora:</span> <strong>${fmtHora(miCita.hora_inicio)} - ${fmtHora(miCita.hora_fin)}</strong></div>
+            <div><span style="color:#64748b">Estado:</span> ${badgeMatriculo(miCita.matriculo)}</div>
+          </div>`;
+      }
+    } catch (e) { console.error(e); }
+  }
+
+  async function solicitarCita() {
+    const carrera_id = document.getElementById('asp-carrera-sel').value;
+    const res = document.getElementById('asp-result');
+    if (!carrera_id) { res.className = 'correo-result err'; res.textContent = 'Seleccione una carrera'; return; }
+    try {
+      const horarios = await api(`/citas/disponibles/carrera/${carrera_id}`);
+      if (!horarios || horarios.length === 0) { throw new Error('No hay horarios disponibles'); }
+      const id_cita = horarios[0].id_cita;
+      const aspiranteGuardado = JSON.parse(localStorage.getItem('aspiranteActual') || '{}');
+      const id_aspirante = parseInt(aspiranteGuardado.id_aspirante) || 1;
+      await api('/citas', { method: 'POST', body: JSON.stringify({ id_aspirante, id_cita }) });
+      res.className = 'correo-result ok'; res.textContent = '✅ ¡Cita solicitada!';
+      toast('✅ Cita solicitada');
+      setTimeout(() => cargarCitaAspirante(id_aspirante), 1500);
+    } catch (error) {
+      res.className = 'correo-result err'; res.textContent = '❌ ' + error.message;
+    }
+  }
+
+  async function iniciarEncargado() {
+    await Promise.all([cargarCarrerasEnFiltros(), cargarEstadisticas(), cargarMatriculas(), cargarAspirantes()]);
+  }
+
+  async function cargarCarrerasEnFiltros() {
+    const carreras = await api('/carreras').catch(() => []);
+    ['filtro-carrera', 'dir-carrera-sel', 'mat-carrera', 'asp-carrera-sel'].forEach(id => {
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      sel.innerHTML = '<option value="">Seleccione una carrera</option>';
+      carreras.forEach(c => sel.innerHTML += `<option value="${c.id_carrera}">${c.nombre_carrera}</option>`);
+    });
+  }
+
+  async function cargarEstadisticas() {
+    const citas = await api('/citas').catch(() => []);
+    document.getElementById('st-total').textContent = citas.length;
+    document.getElementById('st-conf').textContent = citas.filter(c => c.matriculo === true || c.matriculo === 1).length;
+    document.getElementById('st-canc').textContent = citas.filter(c => c.matriculo === false || c.matriculo === 0).length;
+    document.getElementById('st-pend').textContent = citas.filter(c => c.matriculo === null).length;
+  }
+
+  async function cargarCitasPorCarrera() {
+    const carreraId = document.getElementById('filtro-carrera').value;
+    const tbody = document.getElementById('tbody-citas');
+    if (!carreraId) { tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">Seleccione una carrera</td></tr>'; return; }
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">Cargando...</td></tr>';
+    try {
+      citasData = await api(`/citas/carrera/${carreraId}`);
+      paginaActual = 1;
+      renderTabla();
+    } catch (e) { tbody.innerHTML = `<tr><td colspan="6" class="empty-msg">Error: ${e.message}</td></tr>`; }
+  }
+
+  function renderTabla() {
+    const search = document.getElementById('search-citas').value.toLowerCase();
+    const filtroEstado = document.getElementById('filtro-estado').value;
+    let filtradas = citasData.filter(c => {
+      const nombre = `${c.nombres} ${c.apellidos} ${c.email}`.toLowerCase();
+      const matchBusq = !search || nombre.includes(search);
+      let matchEstado = true;
+      if (filtroEstado === 'confirmada') matchEstado = c.matriculo === true || c.matriculo === 1;
+      else if (filtroEstado === 'cancelada') matchEstado = c.matriculo === false || c.matriculo === 0;
+      else if (filtroEstado === 'pendiente') matchEstado = c.matriculo === null;
+      return matchBusq && matchEstado;
+    });
+    const total = filtradas.length;
+    const inicio = (paginaActual - 1) * POR_PAGINA;
+    const pagina = filtradas.slice(inicio, inicio + POR_PAGINA);
+    const tbody = document.getElementById('tbody-citas');
+    if (!pagina.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-msg">Sin resultados</td></tr>'; }
+    else {
+      tbody.innerHTML = pagina.map(c => `
+        <tr>
+          <td><strong>${c.nombres} ${c.apellidos}</strong><br><span style="font-size:11px">${c.email}</span></td>
+          <td>${c.nombre_carrera}</td>
+          <td>${fmtFecha(c.fecha)}</td>
+          <td>${fmtHora(c.hora_inicio)} - ${fmtHora(c.hora_fin)}</td>
+          <td>${badgeMatriculo(c.matriculo)}</td>
+          <td><button class="action-btn" onclick="toggleMatriculo(${c.id_asignacion}, true)">✅</button> <button class="action-btn" onclick="toggleMatriculo(${c.id_asignacion}, false)">❌</button></td>
+        </tr>`).join('');
+    }
+    document.getElementById('citas-count').textContent = `${total} cita${total !== 1 ? 's' : ''}`;
+    document.getElementById('btn-prev').disabled = paginaActual === 1;
+    document.getElementById('btn-next').disabled = inicio + POR_PAGINA >= total;
+  }
+
+  function filtrarTabla() { paginaActual = 1; renderTabla(); }
+  function cambiarPagina(d) { paginaActual += d; renderTabla(); }
+
+  async function toggleMatriculo(id, matriculo) {
+    try {
+      await api(`/citas/${id}/matriculo`, { method: 'PATCH', body: JSON.stringify({ matriculo }) });
+      toast(matriculo ? '✅ Matriculado' : '❌ No matriculado');
+      await cargarCitasPorCarrera();
+      await cargarEstadisticas();
+    } catch (e) { toast('Error: ' + e.message, false); }
+  }
+
+  async function cargarMatriculas() {
+    const lista = await api('/matriculas').catch(() => []);
+    matriculas = lista;
+    const cont = document.getElementById('matricula-list');
+    const selCorreo = document.getElementById('correo-matricula');
+    if (selCorreo) selCorreo.innerHTML = '<option value="">Seleccione un slot</option>';
+    if (!lista.length) { cont.innerHTML = '<div class="empty-msg">Sin slots</div>'; return; }
+    cont.innerHTML = lista.map(m => `
+      <div class="mat-item">
+        <div><h4>${m.nombre_carrera}</h4><p>📅 ${fmtFecha(m.fecha)} | 🕐 ${fmtHora(m.hora_inicio)} - ${fmtHora(m.hora_fin)}</p></div>
+        <div><button class="btn-sm btn-edit" onclick="editarMatricula(${m.id_cita})">✏️</button> <button class="btn-sm btn-deactivate" onclick="eliminarSlot(${m.id_cita})">🗑</button></div>
+      </div>`).join('');
+    if (selCorreo) lista.forEach(m => selCorreo.innerHTML += `<option value="${m.id_cita}">${m.nombre_carrera} — ${fmtFecha(m.fecha)}</option>`);
+  }
+
+  async function guardarMatricula() {
+    const id = document.getElementById('mat-id').value;
+    const id_carrera = document.getElementById('mat-carrera').value;
+    const fecha = document.getElementById('mat-fecha').value;
+    const hora_inicio = document.getElementById('mat-inicio').value;
+    const hora_fin = document.getElementById('mat-fin').value;
+    const res = document.getElementById('mat-result');
+    if (!id_carrera || !fecha || !hora_inicio || !hora_fin) { res.className = 'correo-result err'; res.textContent = 'Complete todos los campos'; return; }
+    try {
+      if (id) await api(`/matriculas/${id}`, { method: 'PUT', body: JSON.stringify({ id_carrera, fecha, hora_inicio, hora_fin }) });
+      else await api('/matriculas', { method: 'POST', body: JSON.stringify({ id_carrera, fecha, hora_inicio, hora_fin }) });
+      res.className = 'correo-result ok'; res.textContent = '✅ Guardado';
+      limpiarFormMat();
+      await cargarMatriculas();
+    } catch (e) { res.className = 'correo-result err'; res.textContent = '❌ ' + e.message; }
+  }
+
+  function editarMatricula(id) {
+    const m = matriculas.find(x => x.id_cita === id);
+    if (!m) return;
+    document.getElementById('mat-id').value = id;
+    document.getElementById('mat-carrera').value = m.id_carrera;
+    document.getElementById('mat-fecha').value = m.fecha ? String(m.fecha).slice(0,10) : '';
+    document.getElementById('mat-inicio').value = m.hora_inicio ? String(m.hora_inicio).slice(0,5) : '';
+    document.getElementById('mat-fin').value = m.hora_fin ? String(m.hora_fin).slice(0,5) : '';
+    document.getElementById('form-mat-title').textContent = 'Editar Slot';
+    document.getElementById('btn-cancel-mat').style.display = 'inline-block';
+  }
+
+  function cancelarEdicionMat() { limpiarFormMat(); }
+  function limpiarFormMat() {
+    ['mat-id','mat-fecha','mat-inicio','mat-fin'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('mat-carrera').value = '';
+    document.getElementById('form-mat-title').textContent = 'Nuevo Período';
+    document.getElementById('btn-cancel-mat').style.display = 'none';
+    document.getElementById('mat-result').className = 'correo-result';
+  }
+
+  async function eliminarSlot(id) {
+    if (!confirm('¿Eliminar?')) return;
+    try { await api(`/matriculas/${id}`, { method: 'DELETE' }); toast('🗑 Eliminado'); await cargarMatriculas(); }
+    catch (e) { toast('Error', false); }
+  }
+
+  async function cargarAspirantes() {
+    const lista = await api('/aspirantes').catch(() => []);
+    aspirantes = lista;
+    const cont = document.getElementById('aspirantes-check');
+    if (!lista.length) { cont.innerHTML = '<div>Sin aspirantes</div>'; return; }
+    cont.innerHTML = lista.map(a => `<div class="asp-check-item"><input type="checkbox" class="asp-chk" value="${a.email}" id="chk-${a.id_aspirante}" /> <label for="chk-${a.id_aspirante}">${a.nombres || a.nombre} ${a.apellidos || ''} (${a.email})</label></div>`).join('');
+  }
+
+  function seleccionarTodos(val) { document.querySelectorAll('.asp-chk').forEach(chk => chk.checked = val); }
+
+  async function enviarCorreoMasivo() {
+    const matId = document.getElementById('correo-matricula').value;
+    const res = document.getElementById('masivo-result');
+    if (!matId) { res.className = 'correo-result err'; res.textContent = 'Seleccione período'; return; }
+    const destinatarios = [...document.querySelectorAll('.asp-chk:checked')].map(c => c.value);
+    if (!destinatarios.length) { res.className = 'correo-result err'; res.textContent = 'Seleccione destinatarios'; return; }
+    const mat = matriculas.find(m => m.id_cita == matId);
+    try {
+      await api('/correos/masivo', { method: 'POST', body: JSON.stringify({ matricula: mat, destinatarios }) });
+      res.className = 'correo-result ok'; res.textContent = '✅ Enviados';
+      toast('✅ Correos enviados');
+    } catch (e) { res.className = 'correo-result err'; res.textContent = '❌ ' + e.message; }
+  }
+
+  async function enviarCorreoManual() {
+    const to = document.getElementById('correo-to').value.trim();
+    const subject = document.getElementById('correo-asunto').value.trim();
+    const msg = document.getElementById('correo-msg').value.trim();
+    const res = document.getElementById('manual-result');
+    if (!to || !subject || !msg) { res.className = 'correo-result err'; res.textContent = 'Complete campos'; return; }
+    const html = `<div><p>${msg.replace(/\n/g,'<br>')}</p></div>`;
+    try {
+      await api('/correos/enviar', { method: 'POST', body: JSON.stringify({ to, subject, html }) });
+      res.className = 'correo-result ok'; res.textContent = '✅ Enviado';
+      toast('✅ Correo enviado');
+      document.getElementById('correo-to').value = '';
+      document.getElementById('correo-asunto').value = '';
+      document.getElementById('correo-msg').value = '';
+    } catch (e) { res.className = 'correo-result err'; res.textContent = '❌ ' + e.message; }
+  }
+
+  async function iniciarDirector() {
+    await cargarCarrerasEnFiltros();
+    const citas = await api('/citas').catch(() => []);
+    document.getElementById('dir-total').textContent = citas.length;
+    document.getElementById('dir-conf').textContent = citas.filter(c => c.matriculo === true || c.matriculo === 1).length;
+    document.getElementById('dir-canc').textContent = citas.filter(c => c.matriculo === false || c.matriculo === 0).length;
+    document.getElementById('dir-pend').textContent = citas.filter(c => c.matriculo === null).length;
+  }
+
+  async function cargarCitasDirector() {
+    const carreraId = document.getElementById('dir-carrera-sel').value;
+    const tbody = document.getElementById('dir-tbody');
+    if (!carreraId) { tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">Seleccione una carrera</td></tr>'; return; }
+    tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">Cargando...</td></tr>';
+    try {
+      const citas = await api(`/citas/carrera/${carreraId}`);
+      if (!citas.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">Sin citas</td></tr>'; return; }
+      tbody.innerHTML = citas.map(c => `<tr><td><strong>${c.nombres} ${c.apellidos}</strong></td><td>${c.email}</td><td>${fmtFecha(c.fecha)}</td><td>${badgeMatriculo(c.matriculo)}</td></tr>`).join('');
+    } catch (e) { tbody.innerHTML = `<tr><td colspan="4" class="empty-msg">Error: ${e.message}</td></tr>`; }
+  }
+</script>
 </body>
 </html>
