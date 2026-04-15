@@ -1,71 +1,31 @@
-const bcrypt = require('bcrypt');
-const aspiranteRepo = require('./aspirante.repository');
+const repo = require('./aspirante.repository');
 
-async function registrarAspirante(datos) {
-  const { nombre, apellidos, email, password, telefono, id_carrera_elegida } = datos;
-
-  if (!nombre || !apellidos || !email || !password) {
-    throw { status: 400, message: 'Nombre, apellidos, email y contraseña son obligatorios' };
-  }
-
-  if (password.length < 6) {
-    throw { status: 400, message: 'La contraseña debe tener al menos 6 caracteres' };
-  }
-
-  const existe = await aspiranteRepo.getAspiranteByEmail(email);
-  if (existe) throw { status: 409, message: 'Ya existe un aspirante con ese email' };
-
-  const password_hash = await bcrypt.hash(password, 10);
-
-  const aspirante = await aspiranteRepo.createAspirante({
-    nombre,
-    apellidos,
-    email,
-    telefono,
-    id_carrera_elegida,
-    password_hash
-  });
-
-  // No devolver el hash al cliente
-  const { password_hash: _, ...aspiranteSinHash } = aspirante;
-  return aspiranteSinHash;
-}
-
-async function loginAspirante({ email, password }) {
-  if (!email || !password) {
-    throw { status: 400, message: 'Email y contraseña son obligatorios' };
-  }
-
-  const aspirante = await aspiranteRepo.getAspiranteByEmail(email);
-  if (!aspirante) {
-    throw { status: 401, message: 'Credenciales incorrectas' };
-  }
-
-  const valido = await bcrypt.compare(password, aspirante.password_hash);
-  if (!valido) {
-    throw { status: 401, message: 'Credenciales incorrectas' };
-  }
-
-  // No devolver el hash al cliente
-  const { password_hash: _, ...aspiranteSinHash } = aspirante;
-  return { aspirante: aspiranteSinHash };
-}
+async function listarAspirantes() { return repo.findAll(); }
 
 async function obtenerAspirante(id) {
-  const aspirante = await aspiranteRepo.getAspiranteById(id);
-  if (!aspirante) throw { status: 404, message: 'Aspirante no encontrado' };
+  const a = await repo.findById(id);
+  if (!a) { const err = new Error('Aspirante no encontrado'); err.status = 404; throw err; }
+  return a;
+}
 
-  const { password_hash: _, ...aspiranteSinHash } = aspirante;
-  return aspiranteSinHash;
+async function crearAspirante(datos) {
+  const { nombres, apellidos, email } = datos;
+  if (!nombres || !apellidos || !email) {
+    const err = new Error('nombres, apellidos y email son requeridos'); err.status = 400; throw err;
+  }
+  const existe = await repo.findByEmail(email);
+  if (existe) { const err = new Error('Ya existe un aspirante con ese email'); err.status = 409; throw err; }
+  return repo.create(datos);
 }
 
 async function actualizarAspirante(id, datos) {
-  const aspirante = await aspiranteRepo.getAspiranteById(id);
-  if (!aspirante) throw { status: 404, message: 'Aspirante no encontrado' };
-
-  const actualizado = await aspiranteRepo.updateAspirante(id, datos);
-  const { password_hash: _, ...aspiranteSinHash } = actualizado;
-  return aspiranteSinHash;
+  await obtenerAspirante(id);
+  return repo.update(id, datos);
 }
 
-module.exports = { registrarAspirante, loginAspirante, obtenerAspirante, actualizarAspirante };
+async function eliminarAspirante(id) {
+  await obtenerAspirante(id);
+  return repo.remove(id);
+}
+
+module.exports = { listarAspirantes, obtenerAspirante, crearAspirante, actualizarAspirante, eliminarAspirante };
