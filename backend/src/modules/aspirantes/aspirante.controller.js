@@ -1,9 +1,16 @@
 const aspiranteService = require('./aspirante.service');
 
-async function crear(req, res, next) {
+async function registrar(req, res, next) {
   try {
     const aspirante = await aspiranteService.registrarAspirante(req.body);
     res.status(201).json(aspirante);
+  } catch (err) { next(err); }
+}
+
+async function login(req, res, next) {
+  try {
+    const result = await aspiranteService.loginAspirante(req.body);
+    res.json(result);
   } catch (err) { next(err); }
 }
 
@@ -21,4 +28,4 @@ async function actualizar(req, res, next) {
   } catch (err) { next(err); }
 }
 
-module.exports = { crear, obtener, actualizar };
+module.exports = { registrar, login, obtener, actualizar };

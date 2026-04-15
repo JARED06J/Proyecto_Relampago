@@ -2,13 +2,16 @@ const express = require('express');
 const router = express.Router();
 const ctrl = require('./aspirante.controller');
 
-// POST /api/aspirantes        → Registrar aspirante (nombres, apellidos, email, telefono, id_carrera_elegida)
-router.post('/', ctrl.crear);
+// POST /api/aspirantes/registro  → Registrar nuevo aspirante
+router.post('/registro', ctrl.registrar);
 
-// GET /api/aspirantes/:id     → Ver datos de un aspirante
+// POST /api/aspirantes/login     → Iniciar sesión
+router.post('/login', ctrl.login);
+
+// GET /api/aspirantes/:id        → Ver datos de un aspirante
 router.get('/:id', ctrl.obtener);
 
-// PUT /api/aspirantes/:id     → Actualizar datos personales y carrera elegida
+// PUT /api/aspirantes/:id        → Actualizar datos personales
 router.put('/:id', ctrl.actualizar);
 
 module.exports = router;

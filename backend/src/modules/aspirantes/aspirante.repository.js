@@ -1,6 +1,6 @@
 const { getConnection, sql } = require('../../config/db');
 
-async function createAspirante({ nombre, apellidos, email, telefono, id_carrera_elegida }) {
+async function createAspirante({ nombre, apellidos, email, telefono, id_carrera_elegida, password_hash }) {
   const pool = await getConnection();
   const result = await pool.request()
     .input('nombre', sql.VarChar(100), nombre)
@@ -8,10 +8,12 @@ async function createAspirante({ nombre, apellidos, email, telefono, id_carrera_
     .input('email', sql.VarChar(150), email)
     .input('telefono', sql.VarChar(20), telefono || null)
     .input('id_carrera_elegida', sql.Int, id_carrera_elegida || null)
+    .input('password_hash', sql.VarChar(255), password_hash)
     .query(`
-      INSERT INTO admin_relampago.aspirantes (nombre, apellidos, email, telefono, id_carrera_elegida)
+      INSERT INTO admin_relampago.aspirantes 
+        (nombre, apellidos, email, telefono, id_carrera_elegida, password_hash)
       OUTPUT INSERTED.*
-      VALUES (@nombre, @apellidos, @email, @telefono, @id_carrera_elegida)
+      VALUES (@nombre, @apellidos, @email, @telefono, @id_carrera_elegida, @password_hash)
     `);
   return result.recordset[0];
 }
@@ -20,7 +22,12 @@ async function getAspiranteById(id) {
   const pool = await getConnection();
   const result = await pool.request()
     .input('id', sql.Int, id)
-    .query('SELECT * FROM admin_relampago.aspirantes WHERE id_aspirante = @id');
+    .query(`
+      SELECT a.*, c.nombre_carrera
+      FROM admin_relampago.aspirantes a
+      LEFT JOIN admin_relampago.carreras c ON a.id_carrera_elegida = c.id_carrera
+      WHERE a.id_aspirante = @id
+    `);
   return result.recordset[0];
 }
 
