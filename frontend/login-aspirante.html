@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Sistema de Citas de Matrícula</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            width: 100%;
+            max-width: 450px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group label {
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-group input {
+            width: auto;
+            margin: 0;
+        }
+
+        .forgot-password {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .register-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .alert {
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+            display: block;
+        }
+
+        .alert.success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Sistema de Citas de Matrícula</h1>
+            <p>Iniciar Sesión - Aspirantes</p>
+        </div>
+
+        <div class="form-container">
+            <div id="alert" class="alert"></div>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>Tipo de Usuario</label>
+                    <select id="tipoUsuario" required>
+                        <option value="aspirante">Aspirante</option>
+                        <option value="estudiante">Estudiante</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Correo Electrónico</label>
+                    <input type="email" id="email" placeholder="ejemplo@universidad.edu" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Contraseña</label>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="remember"> Recordar Sesión
+                    </label>
+                    <a href="#" class="forgot-password" id="forgotPassword">¿Olvidó su contraseña?</a>
+                </div>
+
+                <button type="submit" class="btn">Ingresar</button>
+
+                <div class="register-link">
+                    ¿Eres nuevo aspirante? <a href="registro-aspirante.html">Registrarse aquí</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="footer">
+            © 2024 Universidad. Todos los derechos reservados.
+        </div>
+    </div>
+
+    <script>
+        // URL de la API - Cambia el puerto si es necesario
+        const API_URL = 'http://localhost:3000/api';
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const tipoUsuario = document.getElementById('tipoUsuario').value;
+            const remember = document.getElementById('remember').checked;
+            
+            const alertDiv = document.getElementById('alert');
+            
+            // Validar campos
+            if (!email || !password) {
+                alertDiv.className = 'alert error';
+                alertDiv.textContent = 'Por favor complete todos los campos';
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_URL}/aspirantes/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, tipoUsuario, remember })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    alertDiv.className = 'alert success';
+                    alertDiv.textContent = 'Inicio de sesión exitoso. Redirigiendo...';
+                    
+                    if (remember) {
+                        localStorage.setItem('userEmail', email);
+                        localStorage.setItem('userToken', data.token);
+                    }
+                    
+                    // Guardar datos del aspirante
+                    localStorage.setItem('aspiranteActual', JSON.stringify(data.aspirante || data));
+                    
+                    setTimeout(() => {
+                        window.location.href = 'dashboard-aspirante.html';
+                    }, 1500);
+                } else {
+                    const error = await response.json();
+                    alertDiv.className = 'alert error';
+                    alertDiv.textContent = error.message || 'Credenciales incorrectas';
+                }
+            } catch (error) {
+                // Demo: Simular login exitoso (para pruebas sin backend)
+                console.log('Error de conexión, usando modo demo:', error);
+                alertDiv.className = 'alert success';
+                alertDiv.textContent = 'Inicio de sesión exitoso (Demo). Redirigiendo...';
+                
+                // Guardar datos demo
+                const demoUser = {
+                    id_aspirante: 1,
+                    nombre: 'Juan',
+                    apellidos: 'Pérez',
+                    email: email,
+                    telefono: '7000-0000',
+                    id_carrera_elegida: 1
+                };
+                localStorage.setItem('aspiranteActual', JSON.stringify(demoUser));
+                localStorage.setItem('userEmail', email);
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard-aspirante.html';
+                }, 1500);
+            }
+        });
+        
+        // Cargar email guardado
+        const savedEmail = localStorage.getItem('userEmail');
+        if (savedEmail) {
+            document.getElementById('email').value = savedEmail;
+            document.getElementById('remember').checked = true;
+        }
+        
+        document.getElementById('forgotPassword').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Por favor contacte al administrador para restablecer su contraseña.');
+        });
+    </script>
+</body>
+</html>
