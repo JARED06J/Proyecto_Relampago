@@ -532,7 +532,7 @@
       const aspirante = aspirantesLista.find(a => a.email === email);
       if (aspirante) {
         localStorage.setItem('aspiranteActual', JSON.stringify(aspirante));
-        document.getElementById('asp-name').textContent = `${aspirante.nombres || aspirante.nombre} ${aspirante.apellidos || ''}`;
+        document.getElementById('asp-name').textContent = `${aspirante.nombre || ''} ${aspirante.apellidos || ''}`;
         document.getElementById('asp-id').textContent = `ID: ${aspirante.id_aspirante}`;
         await cargarCitaAspirante(aspirante.id_aspirante);
       }
@@ -549,10 +549,10 @@
         document.getElementById('asp-hora-txt').textContent = fmtHora(miCita.hora_inicio);
         document.getElementById('asp-cita-info').innerHTML = `
           <div style="display:flex;flex-direction:column;gap:12px">
-            <div><span style="color:#64748b">Carrera:</span> <strong>${miCita.nombre_carrera || '—'}</strong></div>
-            <div><span style="color:#64748b">Fecha:</span> <strong>${fmtFecha(miCita.fecha)}</strong></div>
-            <div><span style="color:#64748b">Hora:</span> <strong>${fmtHora(miCita.hora_inicio)} - ${fmtHora(miCita.hora_fin)}</strong></div>
-            <div><span style="color:#64748b">Estado:</span> ${badgeMatriculo(miCita.matriculo)}</div>
+            <div><strong>Carrera:</strong> ${miCita.nombre_carrera || '—'}</div>
+            <div><strong>Fecha:</strong> ${fmtFecha(miCita.fecha)}</div>
+            <div><strong>Hora:</strong> ${fmtHora(miCita.hora_inicio)} - ${fmtHora(miCita.hora_fin)}</div>
+            <div><strong>Estado:</strong> ${badgeMatriculo(miCita.matriculo)}</div>
           </div>`;
       }
     } catch (e) { console.error(e); }
@@ -615,7 +615,7 @@
     const search = document.getElementById('search-citas').value.toLowerCase();
     const filtroEstado = document.getElementById('filtro-estado').value;
     let filtradas = citasData.filter(c => {
-      const nombre = `${c.nombres} ${c.apellidos} ${c.email}`.toLowerCase();
+      const nombre = `${c.nombre || ''} ${c.apellidos || ''} ${c.email || ''}`.toLowerCase();
       const matchBusq = !search || nombre.includes(search);
       let matchEstado = true;
       if (filtroEstado === 'confirmada') matchEstado = c.matriculo === true || c.matriculo === 1;
@@ -631,8 +631,8 @@
     else {
       tbody.innerHTML = pagina.map(c => `
         <tr>
-          <td><strong>${c.nombres} ${c.apellidos}</strong><br><span style="font-size:11px">${c.email}</span></td>
-          <td>${c.nombre_carrera}</td>
+          <td><strong>${c.nombre || ''} ${c.apellidos || ''}</strong><br><span style="font-size:11px">${c.email || ''}</span></td>
+          <td>${c.nombre_carrera || ''}</td>
           <td>${fmtFecha(c.fecha)}</td>
           <td>${fmtHora(c.hora_inicio)} - ${fmtHora(c.hora_fin)}</td>
           <td>${badgeMatriculo(c.matriculo)}</td>
@@ -720,7 +720,7 @@
     aspirantes = lista;
     const cont = document.getElementById('aspirantes-check');
     if (!lista.length) { cont.innerHTML = '<div>Sin aspirantes</div>'; return; }
-    cont.innerHTML = lista.map(a => `<div class="asp-check-item"><input type="checkbox" class="asp-chk" value="${a.email}" id="chk-${a.id_aspirante}" /> <label for="chk-${a.id_aspirante}">${a.nombres || a.nombre} ${a.apellidos || ''} (${a.email})</label></div>`).join('');
+    cont.innerHTML = lista.map(a => `<div class="asp-check-item"><input type="checkbox" class="asp-chk" value="${a.email}" id="chk-${a.id_aspirante}" /> <label for="chk-${a.id_aspirante}">${a.nombre || ''} ${a.apellidos || ''} (${a.email})</label></div>`).join('');
   }
 
   function seleccionarTodos(val) { document.querySelectorAll('.asp-chk').forEach(chk => chk.checked = val); }
@@ -773,7 +773,13 @@
     try {
       const citas = await api(`/citas/carrera/${carreraId}`);
       if (!citas.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">Sin citas</td></tr>'; return; }
-      tbody.innerHTML = citas.map(c => `<tr><td><strong>${c.nombres} ${c.apellidos}</strong></td><td>${c.email}</td><td>${fmtFecha(c.fecha)}</td><td>${badgeMatriculo(c.matriculo)}</td></tr>`).join('');
+      tbody.innerHTML = citas.map(c => `
+        <tr>
+          <td><strong>${c.nombre || ''} ${c.apellidos || ''}</strong></td>
+          <td>${c.email || ''}</td>
+          <td>${fmtFecha(c.fecha)}</td>
+          <td>${badgeMatriculo(c.matriculo)}</td>
+        </tr>`).join('');
     } catch (e) { tbody.innerHTML = `<tr><td colspan="4" class="empty-msg">Error: ${e.message}</td></tr>`; }
   }
 </script>
