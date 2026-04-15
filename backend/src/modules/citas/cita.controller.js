@@ -20,4 +20,26 @@ async function remove(req, res, next) {
   try { await service.eliminarAsignacion(req.params.id); res.json({ mensaje: 'Eliminado' }); } catch (err) { next(err); }
 }
 
+
+
+async function getHorariosDisponibles(req, res, next) {
+  try {
+    const horarios = await service.listarHorariosDisponibles();
+    res.json(horarios);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getHorariosDisponiblesPorCarrera(req, res, next) {
+  try {
+    const horarios = await service.listarHorariosDisponiblesPorCarrera(req.params.id_carrera);
+    res.json(horarios);
+  } catch (err) {
+    next(err);
+  }
+}
+
+
+
 module.exports = { getAll, getOne, getByCarrera, create, updateMatriculo, remove };
