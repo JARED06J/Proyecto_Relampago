@@ -1,5 +1,4 @@
-// src/modules/matricula/matricula.repository.js
-const {getPool, sql } = require('../../config/db');
+const { getPool, sql } = require('../../config/db');
 
 // PUNTO 2: tabla citas_matricula — fecha, hora_inicio, hora_fin
 
@@ -71,8 +70,8 @@ async function update(id, { id_carrera, fecha, hora_inicio, hora_fin }) {
     .input('hora_fin', hora_fin)
     .query(`
       UPDATE citas_matricula
-      SET id_carrera = @id_carrera,
-          fecha      = @fecha,
+      SET id_carrera  = @id_carrera,
+          fecha       = @fecha,
           hora_inicio = @hora_inicio,
           hora_fin    = @hora_fin
       WHERE id_cita = @id
@@ -88,96 +87,59 @@ async function remove(id) {
   return result.rowsAffected[0] > 0;
 }
 
+// Consultar aspirantes por lista de emails
 const consultarPorEmails = async (emails) => {
-    const pool = await getPool();
-
-    if (!emails || emails.length === 0) {
-        throw new Error("Debe enviar al menos un email");
-    }
-
-    const request = pool.request();
-
-    emails.forEach((email, index) => {
-        request.input(`email${index}`, sql.VarChar, email);
-    });
-
-    const condiciones = emails
-        .map((_, index) => `a.email = @email${index}`)
-        .join(' OR ');
-
-    const query = `
-        SELECT 
-            a.id_aspirante, 
-            a.nombre, 
-            a.email,
-            CASE 
-                WHEN ac.matriculo = 1 THEN 'MATRICULADO'
-                ELSE 'NO MATRICULADO'
-            END AS estado
-        FROM aspirantes a
-        LEFT JOIN asignacion_citas ac 
-            ON a.id_aspirante = ac.id_aspirante
-        WHERE ${condiciones}
-    `;
-
-    const result = await request.query(query);
-
-    return result.recordset;
+  if (!emails || emails.length === 0) throw new Error('Debe enviar al menos un email');
+  const pool = await getPool();
+  const request = pool.request();
+  emails.forEach((email, i) => request.input(`email${i}`, sql.VarChar, email));
+  const condiciones = emails.map((_, i) => `a.email = @email${i}`).join(' OR ');
+  const result = await request.query(`
+    SELECT a.id_aspirante, a.nombres, a.email,
+           CASE WHEN ac.matriculo = 1 THEN 'MATRICULADO' ELSE 'NO MATRICULADO' END AS estado
+    FROM aspirantes a
+    LEFT JOIN asignacion_citas ac ON a.id_aspirante = ac.id_aspirante
+    WHERE ${condiciones}
+  `);
+  return result.recordset;
 };
 
+// Filtrar aspirantes por estado de matrícula
 const filtrarPorEstado = async (matriculo) => {
-    const pool = await getPool();
-    const request = pool.request();
-
-    let query = `
-        SELECT 
-            a.id_aspirante,
-            a.nombre,
-            a.email,
-            CASE 
-                WHEN ac.matriculo = 1 THEN 'MATRICULADO'
-                ELSE 'NO MATRICULADO'
-            END AS estado
-        FROM aspirantes a
-        LEFT JOIN asignacion_citas ac 
-            ON a.id_aspirante = ac.id_aspirante
-    `;
-
-    if (matriculo !== undefined) {
-        request.input('matriculo', sql.Bit, matriculo);
-        query += ` WHERE ac.matriculo = @matriculo`;
-    }
-
-    const result = await request.query(query);
-
-    return result.recordset;
+  const pool = await getPool();
+  const request = pool.request();
+  let query = `
+    SELECT a.id_aspirante, a.nombres, a.email,
+           CASE WHEN ac.matriculo = 1 THEN 'MATRICULADO' ELSE 'NO MATRICULADO' END AS estado
+    FROM aspirantes a
+    LEFT JOIN asignacion_citas ac ON a.id_aspirante = ac.id_aspirante
+  `;
+  if (matriculo !== undefined) {
+    request.input('matriculo', sql.Bit, matriculo);
+    query += ' WHERE ac.matriculo = @matriculo';
+  }
+  const result = await request.query(query);
+  return result.recordset;
 };
-// matricula.repository.js
 
+// Obtener matriculados por carrera
 const obtenerMatriculadosPorCarrera = async (idCarrera) => {
-    const pool = await getPool();
-    const request = pool.request();
-
-    request.input('id_carrera', sql.Int, idCarrera);
-
-    const query = `
-        SELECT 
-            a.id_aspirante,
-            a.nombre,
-            a.apellidos,
-            a.email,
-            c.nombre_carrera AS carrera
-        FROM aspirantes a
-        JOIN carreras c 
-            ON a.id_carrera_elegida = c.id_carrera
-        JOIN asignacion_citas ac 
-            ON a.id_aspirante = ac.id_aspirante
-        WHERE ac.matriculo = 1
-        AND c.id_carrera = @id_carrera
-    `;
-
-    const result = await request.query(query);
-
-    return result.recordset;
+  const pool = await getPool();
+  const request = pool.request();
+  request.input('id_carrera', sql.Int, idCarrera);
+  const result = await request.query(`
+    SELECT a.id_aspirante, a.nombres, a.apellidos, a.email,
+           c.nombre_carrera AS carrera
+    FROM aspirantes a
+    JOIN carreras c         ON a.id_carrera_elegida = c.id_carrera
+    JOIN asignacion_citas ac ON a.id_aspirante      = ac.id_aspirante
+    WHERE ac.matriculo = 1
+      AND c.id_carrera = @id_carrera
+  `);
+  return result.recordset;
 };
-module.exports = { findAll, findById, findByCarrera, create, update, remove, consultarPorEmails, filtrarPorEstado,obtenerMatriculadosPorCarrera };
+
+module.exports = {
+  findAll, findById, findByCarrera, create, update, remove,
+  consultarPorEmails, filtrarPorEstado, obtenerMatriculadosPorCarrera
+};

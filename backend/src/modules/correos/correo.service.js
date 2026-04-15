@@ -1,17 +1,34 @@
 const nodemailer = require('nodemailer');
 const { templateCitaAsignada, templateAperturaMatricula } = require('./correo.utils');
 
+// Si no hay credenciales configuradas devuelve null → modo consola (igual que AcordesAcademy)
 function crearTransportador() {
+  const user = process.env.MAIL_USER;
+  const pass = process.env.MAIL_PASS;
+  if (!user || !pass || user.includes('tu_correo')) return null;
+
   return nodemailer.createTransport({
     host: process.env.MAIL_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.MAIL_PORT) || 587,
-    secure: false,
-    auth: { user: process.env.MAIL_USER, pass: process.env.MAIL_PASS },
+    secure: parseInt(process.env.MAIL_PORT) === 465,
+    auth: { user, pass },
   });
 }
 
 async function enviarCorreo({ to, subject, html }) {
   const transporter = crearTransportador();
+
+  // Sin credenciales → imprime en consola (modo desarrollo)
+  if (!transporter) {
+    console.log('\n========== [MAILER DEV] ==========');
+    console.log(`Para:    ${to}`);
+    console.log(`Asunto:  ${subject}`);
+    console.log('(Configura MAIL_USER y MAIL_PASS en .env para envío real)');
+    console.log('===================================\n');
+    return { messageId: 'dev-mode' };
+  }
+
+  // Con credenciales → envío real
   const info = await transporter.sendMail({
     from: process.env.MAIL_FROM || process.env.MAIL_USER,
     to, subject, html,
