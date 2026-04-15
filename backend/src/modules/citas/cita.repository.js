@@ -86,4 +86,74 @@ async function remove(id) {
   return result.rowsAffected[0] > 0;
 }
 
+
+
+// Agrega esta función al final del archivo, antes de module.exports
+
+// Obtener horarios disponibles (citas_matricula que no están asignadas)
+async function findHorariosDisponibles() {
+  const pool = await getPool();
+  const result = await pool.request().query(`
+    SELECT 
+      cm.id_cita,
+      cm.fecha,
+      cm.hora_inicio,
+      cm.hora_fin,
+      c.id_carrera,
+      c.nombre_carrera,
+      CASE 
+        WHEN ac.id_asignacion IS NOT NULL THEN 'asignada'
+        ELSE 'disponible'
+      END as estado
+    FROM citas_matricula cm
+    INNER JOIN carreras c ON cm.id_carrera = c.id_carrera
+    LEFT JOIN asignacion_citas ac ON cm.id_cita = ac.id_cita
+    WHERE ac.id_asignacion IS NULL  -- Solo las no asignadas
+    ORDER BY cm.fecha, cm.hora_inicio
+  `);
+  return result.recordset;
+}
+
+// Obtener horarios disponibles por carrera
+async function findHorariosDisponiblesByCarrera(id_carrera) {
+  const pool = await getPool();
+  const result = await pool.request()
+    .input('id_carrera', id_carrera)
+    .query(`
+      SELECT 
+        cm.id_cita,
+        cm.fecha,
+        cm.hora_inicio,
+        cm.hora_fin,
+        c.id_carrera,
+        c.nombre_carrera
+      FROM citas_matricula cm
+      INNER JOIN carreras c ON cm.id_carrera = c.id_carrera
+      LEFT JOIN asignacion_citas ac ON cm.id_cita = ac.id_cita
+      WHERE cm.id_carrera = @id_carrera AND ac.id_asignacion IS NULL
+      ORDER BY cm.fecha, cm.hora_inicio
+    `);
+  return result.recordset;
+}
+
+// Tu findAll() original (para asignaciones existentes)
+// mantenerla como está para las citas ya agendadas
+
+module.exports = { 
+  findAll,           // Para obtener asignaciones existentes
+  findById, 
+  findByCarrera, 
+  create, 
+  updateMatriculo, 
+  remove,
+  findHorariosDisponibles,        // NUEVA: Para el frontend
+  findHorariosDisponiblesByCarrera // NUEVA: Para filtrar por carrera
+};
+
+
+
+
+
+
+
 module.exports = { findAll, findById, findByCarrera, create, updateMatriculo, remove };

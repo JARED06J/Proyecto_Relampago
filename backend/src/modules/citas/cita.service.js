@@ -36,4 +36,20 @@ async function eliminarAsignacion(id) {
   return repo.remove(id);
 }
 
+async function listarHorariosDisponibles() {
+  return repo.findHorariosDisponibles();
+}
+
+async function listarHorariosDisponiblesPorCarrera(id_carrera) {
+  if (!id_carrera) {
+    const err = new Error('Se requiere id_carrera');
+    err.status = 400;
+    throw err;
+  }
+  return repo.findHorariosDisponiblesByCarrera(id_carrera);
+}
+
+
+
+
 module.exports = { listarCitas, obtenerCita, listarCitasPorCarrera, crearAsignacion, actualizarMatriculo, eliminarAsignacion };

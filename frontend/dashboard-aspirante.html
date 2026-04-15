@@ -59,6 +59,7 @@
             display: flex;
             align-items: center;
             gap: 30px;
+            flex-wrap: wrap;
         }
 
         .avatar {
@@ -175,6 +176,37 @@
             font-size: 28px;
             cursor: pointer;
         }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .form-group small {
+            color: #666;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -235,21 +267,20 @@
             <span class="close" onclick="cerrarModalCita()">&times;</span>
             <h3>Solicitar Cita de Matrícula</h3>
             <form id="formCita">
-                <label>Fecha deseada:</label>
-                <input type="date" id="fechaCita" required>
-                <label>Hora preferida:</label>
-                <select id="horaCita" required>
-                    <option value="">Seleccione una hora</option>
-                    <option value="09:00">9:00 AM</option>
-                    <option value="10:00">10:00 AM</option>
-                    <option value="11:00">11:00 AM</option>
-                    <option value="14:00">2:00 PM</option>
-                    <option value="15:00">3:00 PM</option>
-                    <option value="16:00">4:00 PM</option>
-                </select>
-                <label>Comentarios adicionales:</label>
-                <textarea id="comentarios" rows="3" placeholder="Comentarios..."></textarea>
-                <button type="submit" class="btn">Confirmar Cita</button>
+                <div class="form-group">
+                    <label>Horario Disponible *</label>
+                    <select id="id_cita" required>
+                        <option value="">Cargando horarios...</option>
+                    </select>
+                    <small>Seleccione el horario disponible para su cita</small>
+                </div>
+                
+                <div class="form-group">
+                    <label>Comentarios Adicionales</label>
+                    <textarea id="comentarios" rows="3" placeholder="Escriba cualquier comentario o pregunta..."></textarea>
+                </div>
+                
+                <button type="submit" class="btn">Solicitar Cita</button>
             </form>
         </div>
     </div>
@@ -261,15 +292,15 @@
         // Variable global para el aspirante actual
         let aspiranteActual = null;
         
-        // Cargar datos del aspirante desde localStorage o API
+        // Cargar datos del aspirante
         async function cargarDatosAspirante() {
             const savedAspirante = localStorage.getItem('aspiranteActual');
             
             if (savedAspirante) {
                 aspiranteActual = JSON.parse(savedAspirante);
                 actualizarUI();
+                await cargarMisCitas();
             } else {
-                // Intentar cargar desde API
                 const userId = localStorage.getItem('userId');
                 if (userId) {
                     try {
@@ -278,27 +309,25 @@
                             aspiranteActual = await response.json();
                             localStorage.setItem('aspiranteActual', JSON.stringify(aspiranteActual));
                             actualizarUI();
+                            await cargarMisCitas();
+                            return;
                         }
                     } catch (error) {
                         console.log('Error cargando datos:', error);
-                        mostrarDatosDemo();
                     }
-                } else {
-                    mostrarDatosDemo();
                 }
+                mostrarDatosDemo();
             }
         }
         
         function mostrarDatosDemo() {
-            // Datos de demostración
             aspiranteActual = {
                 id_aspirante: 1,
                 nombre: 'Juan',
                 apellidos: 'Pérez Gómez',
                 email: localStorage.getItem('userEmail') || 'juan.perez@universidad.edu',
                 telefono: '+503 7000 0000',
-                id_carrera_elegida: 1,
-                carrera_nombre: 'Ingeniería en Sistemas'
+                id_carrera_elegida: 1
             };
             actualizarUI();
         }
@@ -312,11 +341,9 @@
             document.getElementById('userTelefono').textContent = aspiranteActual.telefono || 'No registrado';
             document.getElementById('userId').textContent = aspiranteActual.id_aspirante || '-';
             
-            // Iniciales para el avatar
             const iniciales = (aspiranteActual.nombre?.charAt(0) || 'A') + (aspiranteActual.apellidos?.charAt(0) || '');
             document.getElementById('avatarInicial').textContent = iniciales.toUpperCase();
             
-            // Nombre de la carrera (simulado)
             const carreras = {
                 1: 'Ingeniería en Sistemas',
                 2: 'Ingeniería Civil',
@@ -325,8 +352,7 @@
                 5: 'Medicina',
                 6: 'Arquitectura'
             };
-            const carreraNombre = aspiranteActual.carrera_nombre || carreras[aspiranteActual.id_carrera_elegida] || 'No seleccionada';
-            document.getElementById('userCarrera').textContent = carreraNombre;
+            document.getElementById('userCarrera').textContent = carreras[aspiranteActual.id_carrera_elegida] || 'No seleccionada';
         }
         
         function showPerfil() {
@@ -335,65 +361,148 @@
             document.getElementById('profileHeader').style.display = 'flex';
         }
         
-        function showCitas() {
+        async function showCitas() {
             document.getElementById('misCitas').style.display = 'block';
             document.getElementById('cardsSection').style.display = 'none';
             document.getElementById('profileHeader').style.display = 'none';
-            cargarCitas();
+            await cargarMisCitas();
         }
         
-        function cargarCitas() {
-            const citas = JSON.parse(localStorage.getItem('misCitas') || '[]');
+        // Cargar citas del aspirante
+        async function cargarMisCitas() {
             const lista = document.getElementById('listaCitas');
+            lista.innerHTML = '<div class="loading">Cargando sus citas...</div>';
             
-            if (citas.length === 0) {
-                lista.innerHTML = '<p>No tienes citas agendadas.</p>';
-                return;
+            try {
+                const response = await fetch(`${API_URL}/citas`);
+                
+                if (response.ok) {
+                    const todasLasCitas = await response.json();
+                    const misCitas = todasLasCitas.filter(cita => cita.id_aspirante === aspiranteActual?.id_aspirante);
+                    
+                    if (misCitas.length === 0) {
+                        lista.innerHTML = '<p>No tienes citas agendadas.</p>';
+                        return;
+                    }
+                    
+                    lista.innerHTML = misCitas.map(cita => `
+                        <div class="cita-card">
+                            <strong>📅 Cita #${cita.id_asignacion || cita.id}</strong><br>
+                            Fecha: ${cita.fecha || 'No disponible'}<br>
+                            Hora: ${cita.hora_inicio ? `${cita.hora_inicio} a ${cita.hora_fin}` : 'No disponible'}<br>
+                            Estado: ${cita.estado || 'Pendiente'}<br>
+                            Matrículo: ${cita.matriculo ? 'Asignado' : 'Pendiente'}
+                        </div>
+                    `).join('');
+                } else {
+                    lista.innerHTML = '<p class="error-message">Error al cargar sus citas</p>';
+                }
+            } catch (error) {
+                console.error('Error cargando citas:', error);
+                lista.innerHTML = '<p class="error-message">Error de conexión. Intente más tarde.</p>';
             }
+        }
+        
+        // Cargar horarios disponibles desde la API
+        async function cargarHorariosDisponibles() {
+            const select = document.getElementById('id_cita');
+            select.innerHTML = '<option value="">Cargando horarios...</option>';
             
-            lista.innerHTML = citas.map((cita, index) => `
-                <div class="cita-card">
-                    <strong>📅 ${cita.fecha}</strong> - ${cita.hora}<br>
-                    Estado: ${cita.estado || 'Pendiente'}<br>
-                    Comentarios: ${cita.comentarios || 'Ninguno'}
-                </div>
-            `).join('');
+            try {
+                const response = await fetch(`${API_URL}/citas/disponibles`);
+                
+                if (response.ok) {
+                    const horarios = await response.json();
+                    
+                    if (horarios && horarios.length > 0) {
+                        select.innerHTML = '<option value="">Seleccione un horario</option>';
+                        
+                        horarios.forEach(horario => {
+                            const option = document.createElement('option');
+                            option.value = horario.id_cita;
+                            const fecha = horario.fecha || 'Fecha no disponible';
+                            const horaInicio = horario.hora_inicio || 'Hora no disponible';
+                            const horaFin = horario.hora_fin ? ` a ${horario.hora_fin}` : '';
+                            const carrera = horario.nombre_carrera ? ` - ${horario.nombre_carrera}` : '';
+                            option.textContent = `${fecha} - ${horaInicio}${horaFin}${carrera}`;
+                            select.appendChild(option);
+                        });
+                    } else {
+                        select.innerHTML = '<option value="">No hay horarios disponibles</option>';
+                    }
+                } else {
+                    select.innerHTML = '<option value="">Error cargando horarios</option>';
+                }
+            } catch (error) {
+                console.error('Error cargando horarios:', error);
+                select.innerHTML = '<option value="">Error de conexión</option>';
+            }
         }
         
         function abrirModalCita() {
+            cargarHorariosDisponibles();
             document.getElementById('modalCita').style.display = 'flex';
         }
         
         function cerrarModalCita() {
             document.getElementById('modalCita').style.display = 'none';
+            document.getElementById('formCita').reset();
         }
         
-        document.getElementById('formCita')?.addEventListener('submit', (e) => {
+        // Enviar solicitud de cita al backend
+        document.getElementById('formCita')?.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const fecha = document.getElementById('fechaCita').value;
-            const hora = document.getElementById('horaCita').value;
-            const comentarios = document.getElementById('comentarios').value;
             
-            if (!fecha || !hora) {
-                alert('Por favor complete fecha y hora');
+            if (!aspiranteActual || !aspiranteActual.id_aspirante) {
+                alert('Debes iniciar sesión primero');
+                window.location.href = 'login-aspirante.html';
                 return;
             }
             
-            const citas = JSON.parse(localStorage.getItem('misCitas') || '[]');
-            citas.push({ 
-                fecha, 
-                hora, 
-                comentarios,
-                estado: 'Pendiente', 
-                fechaSolicitud: new Date().toISOString(),
-                aspiranteId: aspiranteActual?.id_aspirante
-            });
-            localStorage.setItem('misCitas', JSON.stringify(citas));
+            const id_cita = document.getElementById('id_cita').value;
+            const comentarios = document.getElementById('comentarios').value;
             
-            alert('Cita solicitada exitosamente');
-            cerrarModalCita();
-            document.getElementById('formCita').reset();
-            showCitas();
+            if (!id_cita) {
+                alert('Por favor seleccione un horario disponible');
+                return;
+            }
+            
+            const citaData = {
+                id_aspirante: parseInt(aspiranteActual.id_aspirante),
+                id_cita: parseInt(id_cita)
+            };
+            
+            const btnSubmit = e.target.querySelector('button[type="submit"]');
+            const textoOriginal = btnSubmit.textContent;
+            btnSubmit.textContent = 'Enviando...';
+            btnSubmit.disabled = true;
+            
+            try {
+                const response = await fetch(`${API_URL}/citas`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(citaData)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    alert('¡Cita solicitada exitosamente!');
+                    cerrarModalCita();
+                    await cargarMisCitas();
+                } else {
+                    const error = await response.json();
+                    console.error('Error del servidor:', error);
+                    alert('Error al solicitar cita: ' + (error.message || 'Error desconocido'));
+                }
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                alert('Error de conexión con el servidor');
+            } finally {
+                btnSubmit.textContent = textoOriginal;
+                btnSubmit.disabled = false;
+            }
         });
         
         function verDetalles() {
@@ -404,12 +513,12 @@
             localStorage.removeItem('aspiranteActual');
             localStorage.removeItem('userEmail');
             localStorage.removeItem('userToken');
+            localStorage.removeItem('userId');
             window.location.href = 'login-aspirante.html';
         }
         
         // Inicializar al cargar la página
         cargarDatosAspirante();
-        cargarCitas();
     </script>
 </body>
 </html>
