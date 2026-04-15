@@ -136,19 +136,18 @@ async function findHorariosDisponiblesByCarrera(id_carrera) {
   return result.recordset;
 }
 
-// Tu findAll() original (para asignaciones existentes)
-// mantenerla como está para las citas ya agendadas
 
 module.exports = { 
-  findAll,           // Para obtener asignaciones existentes
-  findById, 
-  findByCarrera, 
-  create, 
-  updateMatriculo, 
-  remove,
-  findHorariosDisponibles,        // NUEVA: Para el frontend
-  findHorariosDisponiblesByCarrera // NUEVA: Para filtrar por carrera
+    findAll,
+    findById, 
+    findByCarrera, 
+    create, 
+    updateMatriculo, 
+    remove,
+    findHorariosDisponibles,
+    findHorariosDisponiblesByCarrera
 };
+
 
 
 
